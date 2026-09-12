@@ -1,0 +1,28 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile and complete personal LIFE//OS state.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "callsign": { "type": "string" },
+        "email": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" },
+        "gameState": {
+          "type": "object",
+          "description": "The player's isolated LIFE//OS state including RPG attributes, quests, inventory, and progression."
+        }
+      },
+      "required": ["userId", "callsign", "email", "createdAt", "gameState"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "entity": "User",
+      "description": "Private, user-isolated document holding all LIFE//OS data for the authenticated operator."
+    }
+  }
+}
