@@ -159,7 +159,7 @@ export const QuestCompleteModal: React.FC<QuestCompleteModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -168,14 +168,16 @@ export const QuestCompleteModal: React.FC<QuestCompleteModalProps> = ({
           onClick={onClose}
           className="fixed inset-0 bg-black/80 backdrop-blur-md"
         />
-
+        {/* Centering wrapper */}
+        <div className="flex min-h-full items-center justify-center p-4 sm:p-6">
         {/* Modal Container */}
         <motion.div
           initial={shouldReduceMotion ? { opacity: 0 } : { scale: 0.95, opacity: 0, y: 15 }}
           animate={shouldReduceMotion ? { opacity: 1 } : { scale: 1, opacity: 1, y: 0 }}
           exit={shouldReduceMotion ? { opacity: 0 } : { scale: 0.95, opacity: 0, y: 15 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-lg bg-[#0b0f17] border border-cyan-500/40 rounded-2xl p-6 sm:p-7 shadow-[0_0_50px_rgba(0,240,255,0.2)] z-10 overflow-hidden"
+          className="relative w-full max-w-lg bg-[#0b0f17] border border-cyan-500/40 rounded-2xl p-6 sm:p-7 shadow-[0_0_50px_rgba(0,240,255,0.2)] z-10 overflow-hidden my-8"
+          style={{ maxHeight: '90dvh', overflowY: 'auto', overscrollBehavior: 'contain' }}
           id="quest-complete-celebration-modal"
         >
           {/* Subtle Ambient glow */}
@@ -310,6 +312,7 @@ export const QuestCompleteModal: React.FC<QuestCompleteModalProps> = ({
             </Button>
           </div>
         </motion.div>
+        </div>
       </div>
     </AnimatePresence>
   );

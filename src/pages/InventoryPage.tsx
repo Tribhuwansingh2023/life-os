@@ -923,10 +923,13 @@ export const InventoryPage: React.FC<InventoryPageProps> = ({
       {/* 6. ITEM DETAIL MODAL / DRAWER                                            */}
       {/* ========================================================================= */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150" onClick={() => setSelectedItem(null)} />
+          <div className="flex min-h-full items-center justify-center p-4">
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-gradient-to-b from-[#0e1422] to-[#090d15] border border-cyan-500/40 rounded-2xl p-6 sm:p-7 shadow-[0_0_50px_rgba(0,240,255,0.15)] relative overflow-hidden"
+            className="w-full max-w-xl bg-gradient-to-b from-[#0e1422] to-[#090d15] border border-cyan-500/40 rounded-2xl p-6 sm:p-7 shadow-[0_0_50px_rgba(0,240,255,0.15)] relative overflow-hidden my-8"
+            style={{ maxHeight: '90dvh', overflowY: 'auto', overscrollBehavior: 'contain' }}
           >
             {/* Close button */}
             <button
@@ -1094,6 +1097,7 @@ export const InventoryPage: React.FC<InventoryPageProps> = ({
                 )}
               </div>
             </div>
+          </div>
           </div>
         </div>
       )}
