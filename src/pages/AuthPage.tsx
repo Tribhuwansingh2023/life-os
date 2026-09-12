@@ -15,7 +15,13 @@ import {
   Key,
   Database,
   RefreshCw,
-  Users
+  Users,
+  Eye,
+  EyeOff,
+  Cpu,
+  Radio,
+  Zap,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameStateContext';
@@ -38,6 +44,7 @@ export const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [inputCallsign, setInputCallsign] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,131 +92,158 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 pb-12 font-sans">
-      {/* Top Banner & Security Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#070b14] via-[#0b101f] to-[#120e24] border border-cyan-500/30 p-6 shadow-2xl">
-        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-          <Shield className="w-64 h-64 text-cyan-400" />
-        </div>
+    <div className="max-w-6xl mx-auto space-y-8 pb-16 font-sans select-none">
+      {/* Hero Header & Holographic Security HUD */}
+      <motion.div
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#060911] via-[#0b1021] to-[#120d29] border border-cyan-500/30 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,240,255,0.12)] backdrop-blur-xl"
+      >
+        {/* Glowing top line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-violet-500 to-amber-400 shadow-[0_0_15px_#00f0ff]" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs uppercase tracking-wider">
-              <Key className="w-3.5 h-3.5 text-cyan-400" />
-              <span>AUTHENTICATION & SECURITY PORTAL</span>
+        {/* Ambient background glow orb */}
+        <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-violet-500/10 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono text-xs uppercase tracking-widest">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <Shield className="w-3.5 h-3.5 text-cyan-400" />
+              <span>NEURAL IDENTITY & SECURITY MATRIX</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-mono font-black text-white tracking-wider">
-              USER IDENTITY & CLOUD ISOLATION
+
+            <h1 className="text-2xl sm:text-4xl font-mono font-extrabold text-white tracking-wider">
+              AUTHENTICATION & DATA GUARDIAN
             </h1>
-            <p className="text-sm text-slate-300 max-w-2xl">
-              Secure authentication, session persistence, and real-time per-user document isolation. Only you can view or modify your character progression, tasks, and inventory.
+
+            <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+              Your real-world quests, level progression, and stats are protected by AES-256 cloud document isolation. Only authenticated session tokens can query or update your character ledger.
             </p>
           </div>
 
-          {/* Cloud Sync Badge */}
-          <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
-            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#07090e]/80 border border-white/10 font-mono text-xs">
-              <span
-                className={`w-2.5 h-2.5 rounded-full ${
-                  syncStatus === 'synced'
-                    ? 'bg-emerald-400 shadow-[0_0_8px_#10b981] animate-pulse'
-                    : syncStatus === 'syncing'
-                    ? 'bg-amber-400 shadow-[0_0_8px_#f59e0b] animate-spin'
-                    : 'bg-slate-500'
-                }`}
-              />
-              <span className="text-slate-200 font-bold">
-                {syncStatus === 'synced' ? 'FIRESTORE CLOUD ACTIVE' : syncStatus === 'syncing' ? 'WRITING DELTAS...' : 'LOCAL EMBEDDED DEMO'}
-              </span>
+          {/* HUD Telemetry Bar */}
+          <div className="grid grid-cols-2 gap-3 shrink-0 font-mono text-xs">
+            <div className="p-3 rounded-2xl bg-[#07090f]/90 border border-cyan-500/20 space-y-1">
+              <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
+                <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
+                <span>CLOUD SYNC NODE</span>
+              </div>
+              <div className="text-emerald-400 font-bold flex items-center gap-1 text-sm">
+                <span className={`w-2 h-2 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-400 shadow-[0_0_8px_#10b981]' : 'bg-amber-400'}`} />
+                {syncStatus === 'synced' ? 'FIRESTORE ACTIVE' : 'DEMO MODE'}
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-400">
-              {user ? `UID: ${user.uid.slice(0, 14)}...` : 'Status: Unauthenticated'}
-            </span>
+
+            <div className="p-3 rounded-2xl bg-[#07090f]/90 border border-cyan-500/20 space-y-1">
+              <div className="text-[10px] text-slate-400 flex items-center gap-1.5">
+                <Cpu className="w-3 h-3 text-cyan-400" />
+                <span>ACTIVE SESSION</span>
+              </div>
+              <div className="text-cyan-300 font-bold text-sm truncate">
+                {user ? callsign : 'UNAUTHENTICATED'}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Grid Layout: Left Authentication Portal, Right Security Specifications */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Form / Active Session Card */}
-        <div className="lg:col-span-6 space-y-6">
+      {/* Main Grid: Auth Form vs Security Highlights */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Left Column: Interactive Auth Hub */}
+        <motion.div
+          initial={{ opacity: 0, x: -15 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="lg:col-span-6 space-y-6"
+        >
           {user ? (
-            /* Active Authenticated Session Card */
-            <div className="p-6 rounded-2xl bg-[#0a0d14] border border-cyan-500/30 text-slate-100 shadow-xl space-y-5 font-mono">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                    <UserIcon className="w-6 h-6" />
+            /* Active Authenticated Profile HUD Card */
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#07090f]/95 border border-cyan-500/30 text-slate-100 shadow-2xl shadow-cyan-950/30 space-y-6 font-mono backdrop-blur-md relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
+
+              <div className="flex items-center justify-between border-b border-white/10 pb-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+                    <UserIcon className="w-7 h-7" />
                   </div>
                   <div>
-                    <span className="text-[10px] text-cyan-400 uppercase tracking-widest block font-bold">AUTHENTICATED OPERATOR</span>
-                    <h3 className="text-lg font-bold text-white">{callsign}</h3>
-                    <p className="text-xs text-slate-400">{user.email || (user.isAnonymous ? 'Guest Anonymous Account' : 'Google Identity')}</p>
+                    <span className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase block">SESSION ACTIVE</span>
+                    <h3 className="text-xl font-bold text-white tracking-wider">{callsign}</h3>
+                    <p className="text-xs text-slate-400 mt-0.5">{user.email || (user.isAnonymous ? 'Guest Agent Session' : 'Google Authentication')}</p>
                   </div>
                 </div>
 
-                <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                  ACTIVE
+                <span className="px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 text-xs font-bold tracking-wider flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#10b981] animate-pulse" />
+                  VERIFIED
                 </span>
               </div>
 
+              {/* Stats Matrix */}
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[10px] text-slate-400 block uppercase">Active Callsign</span>
-                  <span className="text-cyan-300 font-bold text-sm truncate block">{player.username}</span>
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Active Character</span>
+                  <span className="text-cyan-300 font-bold text-sm block truncate">{player.username}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[10px] text-slate-400 block uppercase">Level & Class</span>
-                  <span className="text-slate-200 font-bold text-sm truncate block">Lvl {player.level} {player.characterClass}</span>
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Level & Class</span>
+                  <span className="text-slate-200 font-bold text-sm block truncate">Lvl {player.level} {player.characterClass}</span>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[10px] text-slate-400 block uppercase">Profiles Saved</span>
-                  <span className="text-slate-200 font-bold text-sm block">{profiles.length} Profiles</span>
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Profiles Saved</span>
+                  <span className="text-amber-300 font-bold text-sm block">{profiles.length} Character Slots</span>
                 </div>
-                <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-[10px] text-slate-400 block uppercase">Cloud Sync Path</span>
-                  <span className="text-slate-200 font-bold text-sm truncate block">users/{user.uid.slice(0, 8)}</span>
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Cloud Firestore Path</span>
+                  <span className="text-slate-300 font-bold text-sm block truncate">users/{user.uid.slice(0, 10)}</span>
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+              {/* Logout Button */}
+              <div className="pt-2">
                 <Button
                   onClick={() => signOut()}
-                  className="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-xs uppercase"
+                  className="w-full py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-xs font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-rose-950/40"
                 >
-                  <LogOut className="w-4 h-4 mr-2 inline" /> Sign Out Operator Session
+                  <LogOut className="w-4 h-4 mr-2 inline text-rose-400" /> DISCONNECT SESSION PROTOCOL
                 </Button>
               </div>
             </div>
           ) : (
-            /* Unauthenticated Login / Register Form */
-            <div className="p-6 rounded-2xl bg-[#0a0d14] border border-cyan-500/30 text-slate-100 shadow-xl space-y-5">
-              {/* Header */}
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-                  <Shield className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold font-mono text-cyan-400 tracking-wider uppercase">
-                    {mode === 'signin' ? 'OPERATOR AUTHENTICATION' : 'RECRUIT NEW OPERATOR'}
-                  </h3>
-                  <p className="text-xs text-slate-400">
-                    {mode === 'signin' ? 'Sign in to access your isolated cloud data' : 'Register a new LIFE//OS account in Firebase'}
-                  </p>
+            /* Unauthenticated Login / Register Form Card */
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#07090f]/95 border border-cyan-500/30 text-slate-100 shadow-2xl shadow-cyan-950/30 space-y-6 backdrop-blur-md relative overflow-hidden">
+              {/* Corner accent glow */}
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Form Title & Switcher */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.2)]">
+                    <Shield className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold font-mono text-cyan-400 tracking-wider uppercase">
+                      {mode === 'signin' ? 'OPERATOR AUTHENTICATION' : 'RECRUIT NEW OPERATOR'}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {mode === 'signin' ? 'Access your cloud character ledger & tasks' : 'Establish a new LIFE//OS account in Firebase'}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Mode Switcher */}
-              <div className="grid grid-cols-2 gap-1 p-1 bg-white/5 rounded-xl border border-white/5 text-xs font-mono">
+              {/* Segmented Mode Selector */}
+              <div className="grid grid-cols-2 gap-1.5 p-1.5 bg-black/40 rounded-2xl border border-white/10 text-xs font-mono">
                 <button
                   type="button"
                   onClick={() => {
                     setMode('signin');
                     clearError();
                   }}
-                  className={`py-2 rounded-lg font-semibold transition-all ${
+                  className={`py-2.5 rounded-xl font-bold tracking-wider transition-all duration-200 ${
                     mode === 'signin'
-                      ? 'bg-cyan-500 text-black shadow-md shadow-cyan-500/20'
+                      ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/25 scale-[1.02]'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -221,9 +255,9 @@ export const AuthPage: React.FC = () => {
                     setMode('signup');
                     clearError();
                   }}
-                  className={`py-2 rounded-lg font-semibold transition-all ${
+                  className={`py-2.5 rounded-xl font-bold tracking-wider transition-all duration-200 ${
                     mode === 'signup'
-                      ? 'bg-cyan-500 text-black shadow-md shadow-cyan-500/20'
+                      ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/25 scale-[1.02]'
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -231,22 +265,26 @@ export const AuthPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Error Alert */}
+              {/* Error Banner */}
               {error && (
-                <div className="flex items-center space-x-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center space-x-2.5 p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono"
+                >
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
                   <span>{error}</span>
-                </div>
+                </motion.div>
               )}
 
-              {/* Google Button */}
+              {/* Google OAuth Button */}
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isSubmitting}
-                className="flex items-center justify-center w-full py-2.5 px-4 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-500/40 hover:bg-white/10 text-sm font-medium transition-all group"
+                className="flex items-center justify-center w-full py-3 px-4 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-cyan-500/50 hover:bg-white/[0.08] text-sm font-semibold transition-all group shadow-md"
               >
-                <svg className="w-4 h-4 mr-2.5" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 mr-3" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -264,151 +302,185 @@ export const AuthPage: React.FC = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <span className="group-hover:text-cyan-300">Continue with Google</span>
+                <span className="font-mono text-xs uppercase tracking-wider text-slate-200 group-hover:text-cyan-300">
+                  Authenticate with Google
+                </span>
               </button>
 
-              <div className="relative flex items-center justify-center my-3">
+              {/* Divider */}
+              <div className="relative flex items-center justify-center my-4">
                 <div className="border-t border-white/10 w-full" />
-                <span className="bg-[#0a0d14] px-3 text-[10px] font-mono uppercase tracking-widest text-slate-400">OR EMAIL LOGIN</span>
+                <span className="bg-[#07090f] px-3 text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  OR CREDENTIAL SIGN IN
+                </span>
               </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-3.5 font-mono">
+              {/* Email / Password Form */}
+              <form onSubmit={handleSubmit} className="space-y-4 font-mono">
                 {mode === 'signup' && (
                   <div>
-                    <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                      Callsign / Username
+                    <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">
+                      Operator Callsign Name
                     </label>
                     <div className="relative">
-                      <UserIcon className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                      <UserIcon className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
                       <input
                         type="text"
                         required
                         value={inputCallsign}
                         onChange={(e) => setInputCallsign(e.target.value)}
                         placeholder="e.g. CYBER_NEXUS"
-                        className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
+                        className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 transition-colors"
                       />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
+                  <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="operator@lifeos.net"
-                      className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
+                      className="w-full pl-10 pr-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                    Password
+                  <label className="block text-[11px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">
+                    Security Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                    <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       minLength={6}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-slate-100 focus:border-cyan-500 focus:outline-none"
+                      className="w-full pl-10 pr-10 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 transition-colors"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-2.5 mt-2 bg-cyan-500 hover:bg-cyan-400 text-black font-semibold font-mono tracking-wider text-xs uppercase"
+                  className="w-full py-3.5 mt-2 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-black font-extrabold font-mono tracking-widest text-xs uppercase shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.01]"
                 >
                   {isSubmitting ? (
-                    'TRANSMITTING...'
+                    <span className="flex items-center justify-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" /> TRANSMITTING...
+                    </span>
                   ) : mode === 'signin' ? (
-                    <>
-                      <LogIn className="w-4 h-4 mr-2 inline" /> INITIATE SESSION
-                    </>
+                    <span className="flex items-center justify-center gap-2">
+                      <LogIn className="w-4 h-4" /> INITIATE OPERATOR SESSION
+                    </span>
                   ) : (
-                    <>
-                      <UserPlus className="w-4 h-4 mr-2 inline" /> REGISTER OPERATOR
-                    </>
+                    <span className="flex items-center justify-center gap-2">
+                      <UserPlus className="w-4 h-4" /> ENLIST NEW OPERATOR
+                    </span>
                   )}
                 </Button>
               </form>
 
-              {/* Guest Access Link */}
-              <div className="pt-3 border-t border-white/5 text-center">
+              {/* Instant Guest Demo Card */}
+              <div className="pt-4 border-t border-white/10">
                 <button
                   type="button"
                   onClick={handleGuestSignIn}
                   disabled={isSubmitting}
-                  className="text-xs text-slate-400 hover:text-cyan-400 transition-colors inline-flex items-center space-x-1 font-mono"
+                  className="w-full p-3 rounded-2xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 group"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Instant Guest Access (Demo Session)</span>
+                  <Sparkles className="w-4 h-4 text-cyan-400 group-hover:rotate-12 transition-transform" />
+                  <span>INSTANT GUEST AGENT ACCESS (DEMO SESSION)</span>
                 </button>
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
 
-        {/* Right Column: Security Architecture & Specification */}
-        <div className="lg:col-span-6 space-y-6 font-mono">
-          <div className="p-6 rounded-2xl bg-[#0a0d14] border border-white/10 space-y-4">
-            <h3 className="text-base font-bold text-white tracking-wider flex items-center gap-2 border-b border-white/10 pb-3">
-              <Database className="w-4 h-4 text-cyan-400" />
-              <span>DATA ISOLATION & SECURITY SPECIFICATION</span>
-            </h3>
+        {/* Right Column: Cyberpunk Security Specifications & Cloud Live Status */}
+        <motion.div
+          initial={{ opacity: 0, x: 15 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="lg:col-span-6 space-y-6 font-mono"
+        >
+          {/* Card 1: Data Security Architecture */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-[#07090f]/95 border border-white/10 space-y-5 shadow-2xl backdrop-blur-md relative overflow-hidden">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-base tracking-wider uppercase">
+                <Database className="w-5 h-5 text-cyan-400" />
+                <span>CLOUD DATA GUARDIAN MATRIX</span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-bold">AES-256</span>
+            </div>
 
-            <div className="space-y-3.5 text-xs text-slate-300">
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                <Shield className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+            <div className="space-y-4 text-xs text-slate-300">
+              <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-cyan-500/30 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                  <Shield className="w-5 h-5" />
+                </div>
                 <div>
-                  <h4 className="font-bold text-white mb-0.5">1. Per-User UID Document Scoping</h4>
+                  <h4 className="font-bold text-white mb-1">Strict Document Isolation</h4>
                   <p className="text-slate-400 text-[11px] leading-relaxed">
-                    All tasks, character statistics, badges, inventory items, and profiles are mapped directly to your unique Firebase UID (<code className="text-cyan-300">users/{'{userId}'}</code>). No cross-user access or data leakage is possible.
+                    Every user receives an isolated Firestore document at <code className="text-cyan-300">users/{'{userId}'}</code>. Other operators cannot read or alter your tasks or statistics.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                <RefreshCw className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/30 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <RefreshCw className="w-5 h-5" />
+                </div>
                 <div>
-                  <h4 className="font-bold text-white mb-0.5">2. Reactive Real-Time Cloud Sync</h4>
+                  <h4 className="font-bold text-white mb-1">Real-Time Cloud Socket Sync</h4>
                   <p className="text-slate-400 text-[11px] leading-relaxed">
-                    Changes made to quests, levels, gold, or equipment are instantaneously pushed via encrypted web sockets to cloud Firestore, keeping your session synced across browsers and devices.
+                    Completed quests, gold earnings, momentum, and item equips are instantly broadcast to Firestore. Your state is preserved seamlessly across devices.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5">
-                <Users className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-amber-500/30 transition-colors">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <Users className="w-5 h-5" />
+                </div>
                 <div>
-                  <h4 className="font-bold text-white mb-0.5">3. Multi-Profile Name Architecture</h4>
+                  <h4 className="font-bold text-white mb-1">Multi-Profile Callsign Matrix</h4>
                   <p className="text-slate-400 text-[11px] leading-relaxed">
-                    Create multiple agent profile names (Callsigns) under a single authenticated account. Switch character builds on demand with state preservation.
+                    Create and switch multiple character names under your main account. Each character retains independent XP curves, classes, and quest ledgers.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 text-xs text-cyan-200/80 leading-relaxed">
-            <span className="font-bold text-cyan-400 block mb-1">⚡ SECURITY COMPLIANCE NOTE</span>
-            LIFE//OS uses standard Firebase Identity Tokens (JWT) for session management. Passwords are never stored on client devices or plain-text servers.
+          {/* Card 2: Security & Privacy Compliance Callout */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-cyan-950/30 via-[#07090f] to-violet-950/30 border border-cyan-500/30 text-xs text-cyan-200/90 space-y-2 shadow-xl">
+            <div className="flex items-center gap-2 text-cyan-400 font-bold uppercase tracking-wider text-xs">
+              <Zap className="w-4 h-4 text-cyan-400" />
+              <span>ZERO-KNOWLEDGE CREDENTIAL PROTOCOL</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Passwords and OAuth tokens are processed directly by Firebase Authentication standards. Plaintext credentials never touch client storage or local memory buffers.
+            </p>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
