@@ -72,6 +72,7 @@ export function useGameState() {
     updateXp: (amount: number) => gameService.updateXp(amount),
     updateGold: (amount: number) => gameService.updateGold(amount),
     updateQuestStatus: (questId: string, status: Quest['status']) => gameService.updateQuestStatus(questId, status),
+    deleteQuest: (questId: string) => gameService.deleteQuest(questId),
     rateQuestDifficulty: (questId: string, rating: any, adjustments: any) =>
       gameService.rateQuestDifficulty(questId, rating, adjustments),
     damageBoss: (amount: number) => gameService.damageBoss(amount),

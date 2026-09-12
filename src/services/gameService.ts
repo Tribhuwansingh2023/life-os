@@ -532,7 +532,7 @@ class GameService {
     this.notify();
   }
 
-  // Update Quest Status directly
+  // Update Quest Status directly (in-memory)
   public updateQuestStatus(questId: string, status: Quest['status']) {
     const qIndex = this.quests.findIndex((q) => q.id === questId);
     if (qIndex === -1) return;
@@ -542,7 +542,13 @@ class GameService {
       status,
       completedAt: status === 'completed' ? new Date().toISOString() : undefined
     };
-    this.persistToCloud();
+    this.notify();
+  }
+
+  // Delete Quest (CRUD Delete)
+  public deleteQuest(questId: string) {
+    this.quests = this.quests.filter((q) => q.id !== questId);
+    audioService.playTactileClick();
     this.notify();
   }
 

@@ -39,6 +39,7 @@ interface GameStateContextValue {
   updateXp: (amount: number) => void;
   updateGold: (amount: number) => void;
   updateQuestStatus: (questId: string, status: Quest['status']) => void;
+  deleteQuest: (questId: string) => void;
   rateQuestDifficulty: (
     questId: string,
     rating: 'trivial' | 'accurate' | 'challenging' | 'extreme',
