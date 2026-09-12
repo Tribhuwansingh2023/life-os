@@ -9,12 +9,12 @@ interface AttributeGridProps {
 }
 
 const ICON_MAP: Record<string, React.ReactNode> = {
-  Dumbbell: <Dumbbell className="w-4 h-4" />,
-  Brain: <Brain className="w-4 h-4" />,
-  ShieldCheck: <ShieldCheck className="w-4 h-4" />,
-  Sparkles: <Sparkles className="w-4 h-4" />,
-  HeartPulse: <HeartPulse className="w-4 h-4" />,
-  Users: <Users className="w-4 h-4" />
+  Dumbbell: <Dumbbell className="w-3.5 h-3.5" />,
+  Brain: <Brain className="w-3.5 h-3.5" />,
+  ShieldCheck: <ShieldCheck className="w-3.5 h-3.5" />,
+  Sparkles: <Sparkles className="w-3.5 h-3.5" />,
+  HeartPulse: <HeartPulse className="w-3.5 h-3.5" />,
+  Users: <Users className="w-3.5 h-3.5" />
 };
 
 export const AttributeGrid: React.FC<AttributeGridProps> = ({
@@ -33,40 +33,42 @@ export const AttributeGrid: React.FC<AttributeGridProps> = ({
           <div
             key={attr.key}
             onClick={() => onSelectAttribute && onSelectAttribute(attr)}
-            className="group relative bg-[#0c1017] hover:bg-[#111722] border border-white/[0.08] hover:border-white/[0.2] rounded-xl p-3.5 transition-all cursor-pointer shadow-sm"
+            className="group relative bg-[#0c1017] hover:bg-[#111722] border border-white/[0.08] hover:border-white/[0.2] rounded-xl p-3 overflow-hidden transition-all cursor-pointer shadow-sm"
           >
             {/* Ambient accent strip */}
             <div
-              className="absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"
+              className="absolute top-0 left-3 right-3 h-0.5 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"
               style={{ backgroundColor: attr.color, boxShadow: `0 0 8px ${attr.color}` }}
             />
 
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-1.5 mb-2 min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0 flex-1">
                 <div
-                  className="p-1.5 rounded-lg text-black font-bold flex items-center justify-center"
+                  className="p-1.5 rounded-lg text-black font-bold flex items-center justify-center shrink-0"
                   style={{ backgroundColor: attr.color }}
                 >
-                  {ICON_MAP[attr.iconName] || <Sparkles className="w-4 h-4" />}
+                  {ICON_MAP[attr.iconName] || <Sparkles className="w-3.5 h-3.5" />}
                 </div>
-                <div>
-                  <h4 className="text-xs font-mono font-bold text-white uppercase tracking-wider group-hover:text-cyan-300 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-[11px] sm:text-xs font-mono font-bold text-white uppercase tracking-wider group-hover:text-cyan-300 transition-colors truncate">
                     {attr.label}
                   </h4>
-                  <span className="text-[10px] text-slate-500 font-mono">
+                  <span className="text-[10px] text-slate-500 font-mono block leading-none mt-0.5">
                     LV.{attr.level}
                   </span>
                 </div>
               </div>
 
-              <div className="text-right font-mono">
-                <span className="text-sm font-bold text-white tabular-nums">
-                  {attr.value}
-                </span>
-                <span className="text-[10px] text-slate-500"> / {attr.maxValue}</span>
+              <div className="text-right font-mono shrink-0 pl-1">
+                <div className="flex items-baseline justify-end gap-0.5">
+                  <span className="text-xs sm:text-sm font-bold text-white tabular-nums">
+                    {attr.value}
+                  </span>
+                  <span className="text-[9px] text-slate-500">/{attr.maxValue}</span>
+                </div>
                 {attr.recentGain > 0 && (
                   <span
-                    className="block text-[10px] font-bold"
+                    className="block text-[9px] font-bold leading-none mt-0.5"
                     style={{ color: attr.color }}
                   >
                     +{attr.recentGain}
