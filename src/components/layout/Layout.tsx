@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useRouterState } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGame } from '../../context/GameStateContext';
+import { useAuth } from '../../context/AuthContext';
 import { useSound } from '../../context/SoundContext';
 import { audioService } from '../../services/audioService';
 import { ActiveTab } from '../../types';
@@ -25,6 +26,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const routerState = useRouterState();
   const pathname = routerState.location.pathname;
   const navigate = useNavigate();
+  const { user, authState } = useAuth();
 
   const {
     player,
@@ -49,6 +51,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       }
     }
   }, [navigate]);
+
+  const isLandingPage = pathname === '/' || pathname === '/landing' || pathname === '' || pathname === '/#';
+  const isAuthPage = pathname === '/auth';
+
+  // Auth Guard: Keep login/register strictly in frontend; block unauthenticated access into the dashboard section
+  useEffect(() => {
+    if (authState !== 'AUTH_LOADING' && !user) {
+      if (!isLandingPage && !isAuthPage) {
+        navigate({ to: '/auth' });
+      }
+    }
+  }, [user, authState, isLandingPage, isAuthPage, navigate]);
 
   // Keyboard navigation & quick shortcuts
   useEffect(() => {
@@ -83,8 +97,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [navigate, toggleSound]);
-
-  const isLandingPage = pathname === '/' || pathname === '/landing' || pathname === '' || pathname === '/#';
 
   // Map route path to active navigation tab
   const currentTab: ActiveTab = pathname === '/quests'
@@ -121,23 +133,28 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigate({ to: pathMap[tab] || '/command' });
   };
 
-  // Full-bleed landing page bypass
-  if (isLandingPage || currentTab === 'landing') {
+  // Standalone frontend view bypass (Landing Page or Auth Page — no dashboard layout)
+  if (isLandingPage || isAuthPage || currentTab === 'landing') {
     return (
       <AnimatePresence mode="wait">
         <motion.div
-          key="landing"
+          key={pathname}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="w-full min-h-dvh"
+          className="w-full min-h-dvh bg-[#07090e]"
         >
           {children || <Outlet />}
           <LevelUpModal levelUpEvent={pendingLevelUp} onDismiss={dismissLevelUp} />
         </motion.div>
       </AnimatePresence>
     );
+  }
+
+  // Prevent flashing dashboard if unauthenticated while redirecting to /auth
+  if (authState !== 'AUTH_LOADING' && !user) {
+    return null;
   }
 
   return (

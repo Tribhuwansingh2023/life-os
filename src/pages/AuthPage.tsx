@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { useNavigate } from '@tanstack/react-router';
 import {
   Shield,
   Lock,
@@ -45,7 +44,6 @@ export const AuthPage: React.FC = () => {
   const [inputCallsign, setInputCallsign] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const navigate = useNavigate();
   const profiles = getProfiles ? getProfiles() : [];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,11 +91,24 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-4 font-sans select-none relative">
+    <div className="min-h-screen bg-[#07090e] flex items-center justify-center p-4 font-sans select-none relative overflow-hidden">
+      {/* Ambient background glows */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-b from-cyan-500/[0.08] via-violet-500/[0.04] to-transparent blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[300px] bg-amber-500/[0.03] blur-[100px]" />
+        <div
+          className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)`,
+            backgroundSize: '32px 32px'
+          }}
+        />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-md space-y-4"
+        className="w-full max-w-md space-y-4 relative z-10"
       >
         {/* Back to landing page navigation link */}
         <div className="flex items-center justify-between px-1">

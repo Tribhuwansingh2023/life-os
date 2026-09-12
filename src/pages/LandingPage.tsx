@@ -121,6 +121,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
   const navigate = useNavigate();
   const { user, callsign, signOut } = useAuth();
 
+  const handleAppLaunch = () => {
+    if (user) {
+      onEnterApp();
+    } else {
+      navigate({ to: '/auth' });
+    }
+  };
+
   // Section 2: Real Life Transformation State
   const [selectedActivity, setSelectedActivity] = useState<ExampleActivity>('code');
   const [transformStep, setTransformStep] = useState<'real' | 'quest' | 'complete'>('quest');
@@ -299,11 +307,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
             <button
               onClick={() => {
                 audioService.playLevelUp();
-                onEnterApp();
+                handleAppLaunch();
               }}
               className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wide transition-all shadow-[0_0_20px_rgba(0,240,255,0.25)] hover:shadow-[0_0_25px_rgba(0,240,255,0.4)] active:scale-95 cursor-pointer"
             >
-              <span>ENTER APP</span>
+              <span>{user ? 'ENTER APP' : 'START / SIGN IN'}</span>
               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>
@@ -1006,7 +1014,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                 <button
                   onClick={() => {
                     audioService.playTactileClick();
-                    onEnterApp();
+                    handleAppLaunch();
                   }}
                   className="w-full py-2.5 rounded-lg bg-cyan-400/10 hover:bg-cyan-400/20 border border-cyan-400/40 text-cyan-300 font-mono text-xs font-bold transition-colors"
                 >
@@ -1337,7 +1345,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
             <button
               onClick={() => {
                 audioService.playLevelUp();
-                onEnterApp();
+                handleAppLaunch();
               }}
               className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-sm tracking-wider transition-all shadow-[0_0_30px_rgba(0,240,255,0.35)] hover:shadow-[0_0_45px_rgba(0,240,255,0.6)] active:scale-98"
             >
@@ -1385,7 +1393,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
             <button
               onClick={() => {
                 audioService.playLevelUp();
-                onEnterApp();
+                handleAppLaunch();
               }}
               className="text-cyan-400 hover:text-cyan-300 font-bold cursor-pointer"
             >

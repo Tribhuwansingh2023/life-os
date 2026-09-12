@@ -211,16 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               )}
             </div>
-          ) : (
-            <button
-              onClick={() => navigate({ to: '/' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono text-xs tracking-wider transition-all cursor-pointer"
-              title="Go to Landing Page to Sign In"
-            >
-              <Shield className="w-3.5 h-3.5 text-cyan-400" />
-              <span>SIGN IN ON LANDING</span>
-            </button>
-          )}
+          ) : null}
 
           {/* Quick link to Landing Page */}
           <button
