@@ -103,6 +103,9 @@ class GameService {
 
       if (snap.exists()) {
         const data = snap.data();
+        if (data.profiles && Array.isArray(data.profiles) && data.profiles.length > 0) {
+          this.saveProfiles(data.profiles);
+        }
         if (data.player) this.player = { ...this.player, ...data.player };
         if (data.attributes) this.attributes = data.attributes;
         if (data.quests && Array.isArray(data.quests)) this.quests = data.quests;
@@ -123,6 +126,7 @@ class GameService {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           player: this.player,
+          profiles: this.getProfiles(),
           attributes: this.attributes,
           quests: this.quests,
           regions: this.regions,
@@ -141,6 +145,9 @@ class GameService {
         (remoteSnap) => {
           if (remoteSnap.exists() && !remoteSnap.metadata.hasPendingWrites) {
             const remoteData = remoteSnap.data();
+            if (remoteData.profiles && Array.isArray(remoteData.profiles)) {
+              this.saveProfiles(remoteData.profiles);
+            }
             if (remoteData.player) this.player = { ...this.player, ...remoteData.player };
             if (remoteData.quests) this.quests = remoteData.quests;
             if (remoteData.attributes) this.attributes = remoteData.attributes;
@@ -185,6 +192,7 @@ class GameService {
             userId: this.currentUserId,
             updatedAt: new Date().toISOString(),
             player: this.player,
+            profiles: this.getProfiles(),
             attributes: this.attributes,
             quests: this.quests,
             regions: this.regions,
