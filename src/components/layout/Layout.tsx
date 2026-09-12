@@ -115,7 +115,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       oracle: '/oracle',
       replay: '/replay',
       inventory: '/inventory',
-      settings: '/settings'
+      settings: '/settings',
+      auth: '/auth'
     };
     navigate({ to: pathMap[tab] || '/command' });
   };

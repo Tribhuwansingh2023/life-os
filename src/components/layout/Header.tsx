@@ -49,6 +49,10 @@ const TAB_TITLES: Record<ActiveTab, { title: string; subtitle: string }> = {
   settings: {
     title: 'SYSTEM CONFIGURATION',
     subtitle: 'Audio, accessibility, profile parameters and progress management.'
+  },
+  auth: {
+    title: 'OPERATOR AUTHENTICATION',
+    subtitle: 'Sign in, register, or sync your LIFE//OS cloud progression.'
   }
 };
 
