@@ -26,10 +26,13 @@ interface GameStateContextValue {
   oracle: OracleInsight;
   replayDays: ReplayDay[];
   lastCompletionEvent: QuestCompletionEvent | null;
+  syncStatus: 'synced' | 'syncing' | 'offline' | 'error';
   completeQuest: (id: string) => void;
   acceptOracleQuest: (id: string) => Quest | null;
   setOracle: (oracle: OracleInsight) => void;
   createQuest: (questData: Partial<Quest>) => void;
+  deleteQuest: (id: string) => boolean;
+  updateQuest: (id: string, updates: Partial<Quest>) => Quest | null;
   purchaseItem: (id: string) => boolean;
   toggleEquipItem: (id: string) => boolean | void;
   updateUsername: (name: string) => void;

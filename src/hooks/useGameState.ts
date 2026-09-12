@@ -24,6 +24,7 @@ export function useGameState() {
   const [replayDays, setReplayDays] = useState<ReplayDay[]>(gameService.getReplayDays());
   const [lastCompletionEvent, setLastCompletionEvent] = useState(gameService.lastCompletionEvent);
   const [pendingLevelUp, setPendingLevelUp] = useState(gameService.pendingLevelUp);
+  const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'offline' | 'error'>(gameService.getSyncStatus());
 
   useEffect(() => {
     const unsubscribe = gameService.subscribe(() => {
@@ -38,6 +39,7 @@ export function useGameState() {
       setReplayDays(gameService.getReplayDays());
       setLastCompletionEvent(gameService.lastCompletionEvent);
       setPendingLevelUp(gameService.pendingLevelUp);
+      setSyncStatus(gameService.getSyncStatus());
     });
 
     return () => {
@@ -57,10 +59,13 @@ export function useGameState() {
     replayDays,
     lastCompletionEvent,
     pendingLevelUp,
+    syncStatus,
     completeQuest: (id: string) => gameService.completeQuest(id),
     acceptOracleQuest: (id: string) => gameService.acceptOracleQuest(id),
     setOracle: (o: OracleInsight) => gameService.setOracle(o),
     createQuest: (q: Omit<Quest, 'id' | 'status'>) => gameService.createQuest(q),
+    deleteQuest: (id: string) => gameService.deleteQuest(id),
+    updateQuest: (id: string, updates: Partial<Quest>) => gameService.updateQuest(id, updates),
     purchaseItem: (id: string) => gameService.purchaseItem(id),
     toggleEquipItem: (id: string) => gameService.toggleEquipItem(id),
     updateUsername: (name: string) => gameService.updateUsername(name),

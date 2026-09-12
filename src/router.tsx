@@ -85,8 +85,9 @@ const commandRoute = createRoute({
       oracle,
       replayDays,
       completeQuest,
+      damageBoss,
       createQuest,
-      damageBoss
+      deleteQuest
     } = useGame();
 
     useEffect(() => {
@@ -126,6 +127,7 @@ const commandRoute = createRoute({
           quest={inspectedQuest}
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
+          onDelete={(id) => deleteQuest(id)}
         />
         <CreateQuestModal
           isOpen={isForgeOpen}
@@ -144,7 +146,7 @@ const questsRoute = createRoute({
   component: function QuestsRoute() {
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
     const [isForgeOpen, setIsForgeOpen] = useState(false);
-    const { quests, completeQuest, createQuest } = useGame();
+    const { quests, completeQuest, createQuest, deleteQuest } = useGame();
 
     useEffect(() => {
       updateScreenMeta('Quest Matrix', 'Turn real-life goals into quests, rewards, and progression.');
@@ -162,6 +164,7 @@ const questsRoute = createRoute({
           quest={inspectedQuest}
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
+          onDelete={(id) => deleteQuest(id)}
         />
         <CreateQuestModal
           isOpen={isForgeOpen}
@@ -201,7 +204,7 @@ const worldRoute = createRoute({
   component: function WorldRoute() {
     const navigate = useNavigate();
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
-    const { regions, quests, completeQuest } = useGame();
+    const { regions, quests, completeQuest, deleteQuest } = useGame();
 
     useEffect(() => {
       updateScreenMeta('Biosystem World Map', 'Dynamic topological biomes shaped by real-world habit consistency.');
@@ -232,6 +235,7 @@ const worldRoute = createRoute({
           quest={inspectedQuest}
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
+          onDelete={(id) => deleteQuest(id)}
         />
       </>
     );
@@ -245,7 +249,7 @@ const oracleRoute = createRoute({
   component: function OracleRoute() {
     const navigate = useNavigate();
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
-    const { oracle, quests, completeQuest } = useGame();
+    const { oracle, quests, completeQuest, deleteQuest } = useGame();
 
     useEffect(() => {
       updateScreenMeta('Oracle AI Game Master', 'Your progress, analyzed. Your next move, recommended.');
@@ -276,6 +280,7 @@ const oracleRoute = createRoute({
           quest={inspectedQuest}
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
+          onDelete={(id) => deleteQuest(id)}
         />
       </>
     );

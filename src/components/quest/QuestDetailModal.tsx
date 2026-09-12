@@ -3,18 +3,20 @@ import { Quest } from '../../types';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Clock, Zap, Coins, CheckCircle, Tag, TrendingUp, Sparkles, Swords } from 'lucide-react';
+import { Clock, Zap, Coins, CheckCircle, Tag, TrendingUp, Sparkles, Swords, Trash2 } from 'lucide-react';
 
 interface QuestDetailModalProps {
   quest: Quest | null;
   onClose: () => void;
   onComplete: (id: string) => void;
+  onDelete?: (id: string) => void;
 }
 
 export const QuestDetailModal: React.FC<QuestDetailModalProps> = ({
   quest,
   onClose,
-  onComplete
+  onComplete,
+  onDelete
 }) => {
   if (!quest) return null;
 
@@ -139,22 +141,40 @@ export const QuestDetailModal: React.FC<QuestDetailModalProps> = ({
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center justify-end gap-3 pt-2">
-          <Button variant="ghost" onClick={onClose}>
-            CLOSE
-          </Button>
-          {!isCompleted && (
-            <Button
-              variant="primary"
-              icon={<CheckCircle className="w-4 h-4" />}
+        <div className="flex items-center justify-between gap-3 pt-2">
+          {onDelete ? (
+            <button
+              type="button"
               onClick={() => {
-                onComplete(quest.id);
-                onClose();
+                if (window.confirm(`Permanently delete quest "${quest.title}"?`)) {
+                  onDelete(quest.id);
+                  onClose();
+                }
               }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 text-xs font-mono transition-colors cursor-pointer"
             >
-              COMPLETE QUEST
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>DELETE QUEST</span>
+            </button>
+          ) : <div />}
+
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              CLOSE
             </Button>
-          )}
+            {!isCompleted && (
+              <Button
+                variant="primary"
+                icon={<CheckCircle className="w-4 h-4" />}
+                onClick={() => {
+                  onComplete(quest.id);
+                  onClose();
+                }}
+              >
+                COMPLETE QUEST
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </Modal>
