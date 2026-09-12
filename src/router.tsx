@@ -430,16 +430,17 @@ const settingsRoute = createRoute({
   }
 });
 
-// Route 10: User Auth & Cloud Security Portal
+// Route 10: Operator Authentication (Redirects to Landing Page Embedded Login)
 const authRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth',
   component: function AuthRoute() {
+    const navigate = useNavigate();
     useEffect(() => {
-      updateScreenMeta('User Auth & Security Portal', 'Secure authentication, session management, and per-user cloud document isolation.');
-    }, []);
+      navigate({ to: '/' });
+    }, [navigate]);
 
-    return <AuthPage />;
+    return <LandingPage onEnterApp={() => navigate({ to: '/command' })} />;
   }
 });
 
