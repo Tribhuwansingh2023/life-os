@@ -11,7 +11,8 @@ import {
   OracleInsight,
   ReplayDay,
   LevelUpEvent,
-  AttributeKey
+  AttributeKey,
+  ProfileRecord
 } from '../types';
 import { QuestCompletionEvent } from '../services/gameService';
 
@@ -49,6 +50,10 @@ interface GameStateContextValue {
   resetToDefault: () => void;
   pendingLevelUp: LevelUpEvent | null;
   dismissLevelUp: () => void;
+  getProfiles: () => ProfileRecord[];
+  switchProfile: (profileId: string) => boolean;
+  createNewProfile: (name: string, characterClass?: string) => ProfileRecord;
+  deleteProfile: (profileId: string) => boolean;
 }
 
 export const GameStateContext = createContext<GameStateContextValue | undefined>(undefined);

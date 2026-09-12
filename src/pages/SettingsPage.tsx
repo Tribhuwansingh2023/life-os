@@ -11,6 +11,7 @@ import {
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { ShortcutsModal } from '../components/layout/ShortcutsModal';
+import { ProfileManager } from '../components/profile/ProfileManager';
 import { useSound } from '../context/SoundContext';
 import {
   Volume2,
@@ -221,6 +222,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* 0. MULTI-PROFILE MANAGER                                                  */}
+      {/* ========================================================================= */}
+      <ProfileManager onShowToast={showToast} />
 
       {/* ========================================================================= */}
       {/* 1. SYSTEM SECTION (Audio, Accessibility, Keyboard Navigation)              */}
