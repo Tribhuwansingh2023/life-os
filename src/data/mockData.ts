@@ -253,6 +253,20 @@ export const INITIAL_REGIONS: WorldRegion[] = [
     activeQuestsCount: 0,
     coordinates: { x: 70, y: 75 },
     accentColor: '#38bdf8'
+  },
+  {
+    id: 'reg_nexus',
+    name: 'The Chrono Nexus',
+    codeName: 'NEXUS-06',
+    domain: 'Willpower & Discipline',
+    associatedAttribute: 'discipline',
+    status: 'unlocked',
+    influenceScore: 25,
+    biomeType: 'citadel',
+    description: 'Quantum meridian tower measuring habit execution and protecting streak velocity.',
+    activeQuestsCount: 1,
+    coordinates: { x: 50, y: 50 },
+    accentColor: '#8b5cf6'
   }
 ];
 

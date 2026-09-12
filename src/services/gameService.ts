@@ -545,13 +545,6 @@ class GameService {
     this.notify();
   }
 
-  // Delete Quest (CRUD Delete)
-  public deleteQuest(questId: string) {
-    this.quests = this.quests.filter((q) => q.id !== questId);
-    audioService.playTactileClick();
-    this.notify();
-  }
-
   // Apply user difficulty rating to boost attribute stats and XP
   public rateQuestDifficulty(
     questId: string,

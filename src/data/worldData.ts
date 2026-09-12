@@ -190,6 +190,35 @@ export const REGION_CONFIGS: Record<string, RegionMetaConfig> = {
       { percentage: 75, title: 'Civic Amphitheater', description: 'Leadership and mutual support elevate the entire guild.' },
       { percentage: 100, title: 'The Sunken Colosseum Forum', description: 'Social mastery unlocked. Deep relationships enrich your world.' }
     ]
+  },
+  reg_nexus: {
+    regionId: 'reg_nexus',
+    attributeKey: 'discipline',
+    attributeLabel: 'Discipline',
+    attributeIcon: ShieldCheck,
+    realLifeAction: 'Habits & Unbroken Consistency',
+    humanNarrative:
+      'Your streak momentum, habit consistency, and impulse control fortify this central Meridian Spire.',
+    accentColor: '#8b5cf6',
+    bgGlowColor: 'rgba(139, 92, 246, 0.15)',
+    landmark: {
+      id: 'lm_nexus',
+      regionId: 'reg_nexus',
+      name: 'The Chrono Meridian Spire',
+      tagline: 'Heart of Unbroken Consistency',
+      description:
+        'A quantum clockwork tower measuring your daily habit execution, shielding your momentum against decay.',
+      requiredScore: 100,
+      rewardBadgeTitle: 'Chrono Warden Badge',
+      rewardPerk: '+15% Discipline gain and 50% slower momentum decay rate',
+      icon: Compass
+    },
+    milestones: [
+      { percentage: 25, title: 'Habit Anchor', description: 'First consistent streak milestones established.' },
+      { percentage: 50, title: 'Chrono Matrix', description: 'Daily routines run smoothly with low friction.' },
+      { percentage: 75, title: 'Meridian Barrier', description: 'Procrastination entropy deflected.' },
+      { percentage: 100, title: 'The Chrono Meridian Spire', description: 'Discipline mastery achieved. Unbroken momentum zenith.' }
+    ]
   }
 };
 

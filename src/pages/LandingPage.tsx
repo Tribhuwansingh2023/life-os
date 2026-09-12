@@ -99,6 +99,17 @@ const REGIONS: RegionData[] = [
     reward: 'SERENE EMBLEM',
     color: '#10b981', // emerald
     description: 'Sanctuary of restorative sleep, hydration, mindfulness, and recovery.'
+  },
+  {
+    id: 'agora',
+    name: 'THE AGORA',
+    attribute: 'Social',
+    resonance: 75,
+    questsCompleted: 10,
+    nextMilestone: '15 Quests Completed',
+    reward: 'CIVIC EMBLEM',
+    color: '#38bdf8', // sky
+    description: 'Floating forum of mentorship, team synchronization, active networking, and community.'
   }
 ];
 
