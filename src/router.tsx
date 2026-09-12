@@ -27,6 +27,7 @@ import { OraclePage } from './pages/OraclePage';
 import { ReplayPage } from './pages/ReplayPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AuthPage } from './pages/AuthPage';
 
 // Meta tag updater helper
 function updateScreenMeta(title: string, description: string) {
@@ -394,6 +395,19 @@ const settingsRoute = createRoute({
   }
 });
 
+// Route 10: User Auth & Cloud Security Portal
+const authRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/auth',
+  component: function AuthRoute() {
+    useEffect(() => {
+      updateScreenMeta('User Auth & Security Portal', 'Secure authentication, session management, and per-user cloud document isolation.');
+    }, []);
+
+    return <AuthPage />;
+  }
+});
+
 // Create Route Tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -405,7 +419,8 @@ const routeTree = rootRoute.addChildren([
   oracleRoute,
   replayRoute,
   inventoryRoute,
-  settingsRoute
+  settingsRoute,
+  authRoute
 ]);
 
 export const router = createRouter({

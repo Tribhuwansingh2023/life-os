@@ -87,6 +87,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       tab: 'settings',
       label: 'System Settings',
       icon: <Settings className="w-4 h-4" />
+    },
+    {
+      tab: 'auth',
+      label: 'Auth & Security',
+      icon: <Shield className="w-4 h-4 text-cyan-400" />,
+      badge: 'CLOUD'
     }
   ];
 
