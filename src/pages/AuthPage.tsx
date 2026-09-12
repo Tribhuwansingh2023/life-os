@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import {
   Shield,
@@ -39,6 +40,7 @@ export const AuthPage: React.FC = () => {
   const [inputCallsign, setInputCallsign] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const navigate = useNavigate();
   const profiles = getProfiles ? getProfiles() : [];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,6 +53,7 @@ export const AuthPage: React.FC = () => {
       } else {
         await signUpWithEmail(email, password, inputCallsign);
       }
+      navigate({ to: '/command' });
     } catch {
       // Handled in context
     } finally {
@@ -63,6 +66,7 @@ export const AuthPage: React.FC = () => {
     clearError();
     try {
       await signInWithGoogle();
+      navigate({ to: '/command' });
     } catch {
       // Handled
     } finally {
@@ -75,6 +79,7 @@ export const AuthPage: React.FC = () => {
     clearError();
     try {
       await signInAsGuest();
+      navigate({ to: '/command' });
     } catch {
       // Handled
     } finally {
@@ -124,12 +129,21 @@ export const AuthPage: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              onClick={() => signOut()}
-              className="w-full py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-xs font-bold uppercase tracking-wider transition-all"
-            >
-              <LogOut className="w-4 h-4 mr-2 inline" /> DISCONNECT SESSION
-            </Button>
+            <div className="space-y-3">
+              <Button
+                onClick={() => navigate({ to: '/command' })}
+                className="w-full py-3.5 bg-cyan-400 hover:bg-cyan-300 text-black font-mono text-xs font-extrabold uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(0,240,255,0.3)] cursor-pointer"
+              >
+                ENTER COMMAND CENTER →
+              </Button>
+
+              <Button
+                onClick={() => signOut()}
+                className="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 mr-2 inline" /> DISCONNECT SESSION
+              </Button>
+            </div>
           </div>
         ) : (
           /* Unauthenticated Clean Auth Card */

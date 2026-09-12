@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Sparkles,
@@ -28,7 +29,6 @@ import {
 } from 'lucide-react';
 import { audioService } from '../services/audioService';
 import { useAuth } from '../context/AuthContext';
-import { InlineAuthCard } from '../components/auth/InlineAuthCard';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -118,18 +118,8 @@ const REGIONS: RegionData[] = [
 ];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
+  const navigate = useNavigate();
   const { user, callsign, signOut } = useAuth();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [showAuthCard, setShowAuthCard] = useState(false);
-
-  const openAuthCard = () => {
-    setShowAuthCard(true);
-    // Smooth scroll to the auth card after state update
-    setTimeout(() => {
-      const el = document.getElementById('auth-card-anchor');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
-  };
 
   // Section 2: Real Life Transformation State
   const [selectedActivity, setSelectedActivity] = useState<ExampleActivity>('code');
@@ -297,7 +287,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
               <button
                 onClick={() => {
                   audioService.playTactileClick();
-                  openAuthCard();
+                  navigate({ to: '/auth' });
                 }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_12px_rgba(0,240,255,0.15)]"
               >
@@ -367,7 +357,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                   if (user) {
                     onEnterApp();
                   } else {
-                    openAuthCard();
+                    navigate({ to: '/auth' });
                   }
                 }}
                 className="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_25px_rgba(0,240,255,0.3)] hover:shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-98 cursor-pointer"
@@ -380,7 +370,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                 <button
                   onClick={() => {
                     audioService.playTactileClick();
-                    openAuthCard();
+                    navigate({ to: '/auth' });
                   }}
                   className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)]"
                 >
@@ -404,69 +394,136 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
             </p>
           </div>
 
-          {/* Right Column: Auth card — revealed on demand */}
-          <div id="auth-card-anchor" className="lg:col-span-5">
-            <AnimatePresence mode="wait">
-              {showAuthCard ? (
-                <motion.div
-                  key="auth-card"
-                  initial={{ opacity: 0, y: 16, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.97 }}
-                  transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
-                >
-                  <InlineAuthCard onEnterApp={onEnterApp} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="auth-teaser"
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="rounded-2xl border border-white/[0.08] bg-[#0c111c]/80 backdrop-blur-sm p-8 flex flex-col items-center gap-6 text-center cursor-pointer group"
-                  onClick={() => openAuthCard()}
-                >
-                  {/* Logo / Icon */}
-                  <div className="w-16 h-16 rounded-2xl bg-[#0d131f] border border-cyan-500/30 flex items-center justify-center shadow-[0_0_30px_rgba(0,240,255,0.15)] group-hover:shadow-[0_0_40px_rgba(0,240,255,0.25)] transition-all">
-                    <span className="font-mono font-black text-cyan-400 text-2xl">//</span>
+          {/* Right Column: Hero Visual — RPG Character Identity Screen */}
+          <div className="lg:col-span-5">
+            <div className="relative rounded-2xl bg-[#0a0e16] border border-cyan-500/30 p-5 sm:p-6 shadow-2xl">
+              {/* Subtle accent corner badges */}
+              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <Crown className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 block leading-none">
+                      PILOT IDENTITY
+                    </span>
+                    <span className="text-xs font-mono font-bold text-white">{user ? (callsign || 'Pilot') : 'Tribhuwan'}</span>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-amber-400 font-mono font-bold text-sm tracking-wider">
+                    LEVEL 17
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400 block leading-none">
+                    DISCIPLINED SAGE
+                  </span>
+                </div>
+              </div>
+
+              {/* XP Gauge */}
+              <div className="space-y-2 mb-5">
+                <div className="flex justify-between items-center text-xs font-mono">
+                  <span className="text-slate-400 text-[11px]">EXPERIENCE</span>
+                  <span className="text-amber-400 font-medium">
+                    2,840 <span className="text-slate-500">/ 3,200 XP</span>
+                  </span>
+                </div>
+                <div className="w-full h-2.5 bg-[#05070c] rounded-full overflow-hidden border border-white/[0.06] p-0.5">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-cyan-400 transition-all duration-1000"
+                    style={{ width: '88.75%' }}
+                  />
+                </div>
+                <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                  <span>Next Level: +360 XP</span>
+                  <span className="text-cyan-400">88.7% to Level 18</span>
+                </div>
+              </div>
+
+              {/* Six Core Attributes Visual Matrix */}
+              <div className="space-y-2.5 pt-2 border-t border-white/[0.06]">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+                    CHARACTER BUILD STATS
+                  </span>
+                  <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                    <Activity className="w-3 h-3" /> +15% Momentum Active
+                  </span>
+                </div>
+
+                <div className="space-y-2 font-mono text-xs">
+                  {/* Intellect */}
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1">
+                      <span className="text-slate-300 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                        INTELLECT
+                      </span>
+                      <span className="font-bold text-white">91</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
+                      <div className="h-full bg-sky-400 rounded-full" style={{ width: '91%' }} />
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <h3 className="font-mono font-bold text-white text-base tracking-wider">OPERATOR ACCESS PORTAL</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed">Sign in to sync your progress across devices and unlock cloud persistence.</p>
+                  {/* Strength */}
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1">
+                      <span className="text-slate-300 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+                        STRENGTH
+                      </span>
+                      <span className="font-bold text-white">72</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
+                      <div className="h-full bg-rose-400 rounded-full" style={{ width: '72%' }} />
+                    </div>
                   </div>
 
-                  {/* Feature bullets */}
-                  <div className="w-full space-y-2 text-left">
-                    {[
-                      { icon: '⚡', text: 'Google Sign-In or Email' },
-                      { icon: '☁️', text: 'Cloud-synced across devices' },
-                      { icon: '👤', text: 'Guest mode — no sign-up needed' },
-                    ].map((item) => (
-                      <div key={item.text} className="flex items-center gap-2.5 text-xs text-slate-300">
-                        <span>{item.icon}</span>
-                        <span>{item.text}</span>
-                      </div>
-                    ))}
+                  {/* Discipline */}
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1">
+                      <span className="text-slate-300 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                        DISCIPLINE
+                      </span>
+                      <span className="font-bold text-white">81</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
+                      <div className="h-full bg-cyan-400 rounded-full" style={{ width: '81%' }} />
+                    </div>
                   </div>
+                </div>
+              </div>
 
+              {/* Action Button inside Hero Card */}
+              <div className="mt-5 pt-3 border-t border-white/[0.06]">
+                {user ? (
                   <button
-                    onClick={(e) => { e.stopPropagation(); audioService.playTactileClick(); openAuthCard(); }}
-                    className="w-full py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(0,240,255,0.25)] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] cursor-pointer"
+                    onClick={() => {
+                      audioService.playLevelUp();
+                      onEnterApp();
+                    }}
+                    className="w-full py-3 rounded-xl bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(0,240,255,0.25)] cursor-pointer flex items-center justify-center gap-2"
                   >
-                    SIGN IN / CREATE ACCOUNT
+                    <span>ENTER COMMAND CENTER</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-
+                ) : (
                   <button
-                    onClick={(e) => { e.stopPropagation(); audioService.playLevelUp(); onEnterApp(); }}
-                    className="text-xs text-slate-500 hover:text-cyan-400 transition-colors font-mono cursor-pointer underline underline-offset-4"
+                    onClick={() => {
+                      audioService.playTactileClick();
+                      navigate({ to: '/auth' });
+                    }}
+                    className="w-full py-3 rounded-xl bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)] flex items-center justify-center gap-2"
                   >
-                    Continue as Guest — no sign-up
+                    <UserIcon className="w-4 h-4 text-cyan-400" />
+                    <span>GO TO LOGIN PAGE →</span>
                   </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
