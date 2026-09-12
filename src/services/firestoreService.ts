@@ -17,7 +17,8 @@ import {
   InventoryItem,
   Badge,
   OracleInsight,
-  ReplayDay
+  ReplayDay,
+  ProfileRecord
 } from '../types';
 
 export interface UserCloudState {
@@ -33,6 +34,7 @@ export interface UserCloudState {
   inventory: InventoryItem[];
   badges: Badge[];
   replayDays: ReplayDay[];
+  profiles?: ProfileRecord[];
 }
 
 /**

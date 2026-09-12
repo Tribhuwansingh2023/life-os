@@ -430,28 +430,16 @@ const settingsRoute = createRoute({
   }
 });
 
-<<<<<<< HEAD
 // Route 10: User Auth & Cloud Security Portal
-=======
-// Route 10: Operator Authentication
->>>>>>> origin/main
 const authRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth',
   component: function AuthRoute() {
-<<<<<<< HEAD
     useEffect(() => {
       updateScreenMeta('User Auth & Security Portal', 'Secure authentication, session management, and per-user cloud document isolation.');
     }, []);
 
     return <AuthPage />;
-=======
-    const navigate = useNavigate();
-    useEffect(() => {
-      updateScreenMeta('Initialize Operator', 'Authenticate to synchronize your LIFE//OS progression across neural clouds.');
-    }, []);
-    return <AuthPage onViewLanding={() => navigate({ to: '/' })} />;
->>>>>>> origin/main
   }
 });
 
