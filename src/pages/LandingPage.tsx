@@ -28,7 +28,6 @@ import {
 } from 'lucide-react';
 import { audioService } from '../services/audioService';
 import { useAuth } from '../context/AuthContext';
-import { AuthModal } from '../components/auth/AuthModal';
 import { InlineAuthCard } from '../components/auth/InlineAuthCard';
 
 interface LandingPageProps {
@@ -120,7 +119,14 @@ const REGIONS: RegionData[] = [
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
   const { user, callsign, signOut } = useAuth();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const scrollToAuth = () => {
+    audioService.playTactileClick();
+    const el = document.getElementById('auth-card');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
 
   // Section 2: Real Life Transformation State
   const [selectedActivity, setSelectedActivity] = useState<ExampleActivity>('code');
@@ -286,10 +292,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
               </div>
             ) : (
               <button
-                onClick={() => {
-                  audioService.playTactileClick();
-                  setIsAuthModalOpen(true);
-                }}
+                onClick={scrollToAuth}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_12px_rgba(0,240,255,0.15)]"
               >
                 <UserIcon className="w-3.5 h-3.5" />
@@ -365,10 +368,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
               </button>
 
               <button
-                onClick={() => {
-                  audioService.playTactileClick();
-                  setIsAuthModalOpen(true);
-                }}
+                onClick={scrollToAuth}
                 className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)]"
               >
                 <UserIcon className="w-4 h-4 text-cyan-400" />
@@ -1263,8 +1263,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           </div>
         </div>
       </footer>
-
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 };

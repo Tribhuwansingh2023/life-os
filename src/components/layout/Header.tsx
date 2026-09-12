@@ -5,7 +5,6 @@ import { Plus, Coins, Zap, Volume2, VolumeX, Keyboard, Compass, Shield, LogOut, 
 import { Button } from '../ui/Button';
 import { useAuth } from '../../context/AuthContext';
 import { useGame } from '../../context/GameStateContext';
-import { AuthModal } from '../auth/AuthModal';
 
 interface HeaderProps {
   currentTab: ActiveTab;
@@ -70,7 +69,6 @@ export const Header: React.FC<HeaderProps> = ({
   const navigate = useNavigate();
   const { user, callsign, signOut } = useAuth();
   const { syncStatus, getProfiles, switchProfile, createNewProfile } = useGame();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isCreateProfileModalOpen, setIsCreateProfileModalOpen] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
@@ -215,11 +213,12 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           ) : (
             <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono text-xs tracking-wider transition-all"
+              onClick={() => navigate({ to: '/' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-mono text-xs tracking-wider transition-all cursor-pointer"
+              title="Go to Landing Page to Sign In"
             >
               <Shield className="w-3.5 h-3.5 text-cyan-400" />
-              <span>SIGN IN</span>
+              <span>SIGN IN ON LANDING</span>
             </button>
           )}
 
