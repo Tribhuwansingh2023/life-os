@@ -29,6 +29,7 @@ import {
 import { audioService } from '../services/audioService';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
+import { InlineAuthCard } from '../components/auth/InlineAuthCard';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -389,153 +390,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
             </p>
           </div>
 
-          {/* Right Column: Hero Visual — Genuine RPG Character Identity Screen */}
+          {/* Right Column: Embedded Operator Access & Authentication Portal */}
           <div className="lg:col-span-5">
-            <div className="relative rounded-2xl bg-[#0a0e16] border border-white/[0.1] p-5 sm:p-6 shadow-2xl">
-              {/* Subtle accent corner badges */}
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                    <Crown className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400 block leading-none">
-                      PILOT IDENTITY
-                    </span>
-                    <span className="text-xs font-mono font-bold text-white">Tribhuwan</span>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-amber-400 font-mono font-bold text-sm tracking-wider">
-                    LEVEL 17
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400 block leading-none">
-                    DISCIPLINED SAGE
-                  </span>
-                </div>
-              </div>
-
-              {/* XP Gauge */}
-              <div className="space-y-2 mb-5">
-                <div className="flex justify-between items-center text-xs font-mono">
-                  <span className="text-slate-400 text-[11px]">EXPERIENCE</span>
-                  <span className="text-amber-400 font-medium">
-                    2,840 <span className="text-slate-500">/ 3,200 XP</span>
-                  </span>
-                </div>
-                <div className="w-full h-2.5 bg-[#05070c] rounded-full overflow-hidden border border-white/[0.06] p-0.5">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-cyan-400 transition-all duration-1000"
-                    style={{ width: '88.75%' }}
-                  />
-                </div>
-                <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                  <span>Next Level: +360 XP</span>
-                  <span className="text-cyan-400">88.7% to Level 18</span>
-                </div>
-              </div>
-
-              {/* Six Core Attributes Visual Matrix */}
-              <div className="space-y-2.5 pt-2 border-t border-white/[0.06]">
-                <div className="flex justify-between items-center">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
-                    CHARACTER BUILD STATS
-                  </span>
-                  <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                    <Activity className="w-3 h-3" /> +15% Momentum Active
-                  </span>
-                </div>
-
-                <div className="space-y-2 font-mono text-xs">
-                  {/* Intellect */}
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                        INTELLECT
-                      </span>
-                      <span className="font-bold text-white">91</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
-                      <div className="h-full bg-sky-400 rounded-full" style={{ width: '91%' }} />
-                    </div>
-                  </div>
-
-                  {/* Strength */}
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-                        STRENGTH
-                      </span>
-                      <span className="font-bold text-white">72</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
-                      <div className="h-full bg-rose-400 rounded-full" style={{ width: '72%' }} />
-                    </div>
-                  </div>
-
-                  {/* Discipline */}
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                        DISCIPLINE
-                      </span>
-                      <span className="font-bold text-white">81</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
-                      <div className="h-full bg-cyan-400 rounded-full" style={{ width: '81%' }} />
-                    </div>
-                  </div>
-
-                  {/* Creativity */}
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                        CREATIVITY
-                      </span>
-                      <span className="font-bold text-white">83</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
-                      <div className="h-full bg-purple-400 rounded-full" style={{ width: '83%' }} />
-                    </div>
-                  </div>
-
-                  {/* Wellness */}
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                        WELLNESS
-                      </span>
-                      <span className="font-bold text-white">74</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#05070c] rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-400 rounded-full" style={{ width: '74%' }} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Equipped Armory Artifact */}
-              <div className="mt-5 p-3 rounded-xl bg-[#06090e] border border-white/[0.06] flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                    <Zap className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-mono uppercase text-amber-400 font-bold block">
-                      EQUIPPED ARTIFACT
-                    </span>
-                    <span className="text-xs font-mono text-white">Chronometer of Flow</span>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono text-slate-400">+10% Momentum Retention</span>
-              </div>
-            </div>
+            <InlineAuthCard onEnterApp={onEnterApp} />
           </div>
         </div>
       </section>
