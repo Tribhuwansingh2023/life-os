@@ -23,8 +23,9 @@ import {
 } from '../data/mockData';
 import { audioService } from './audioService';
 import confetti from 'canvas-confetti';
-import { doc, getDoc, setDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { firestoreService, UserCloudState } from './firestoreService';
 
 export interface LevelUpEvent {
   oldLevel: number;
@@ -78,8 +79,8 @@ class GameService {
     this.listeners.forEach((listener) => listener());
   }
 
-  // Bind authenticated user to Firestore cloud document
-  public async bindUser(userId: string | null, callsign?: string) {
+  // Bind authenticated user to Firestore cloud repository
+  public async bindUser(userId: string | null, callsign?: string): Promise<boolean> {
     if (this.unsubscribeSnapshot) {
       this.unsubscribeSnapshot();
       this.unsubscribeSnapshot = null;
@@ -89,7 +90,7 @@ class GameService {
       this.currentUserId = null;
       this.syncStatus = 'offline';
       this.notify();
-      return;
+      return false;
     }
 
     this.currentUserId = userId;
@@ -97,26 +98,27 @@ class GameService {
     this.notify();
 
     try {
-      const userRef = doc(db, 'users', userId);
-      const snap = await getDoc(userRef);
+      // 1. Attempt to load existing user cloud document via firestoreService
+      const cloudState = await firestoreService.loadUserState(userId);
 
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.player) this.player = { ...this.player, ...data.player };
-        if (data.attributes) this.attributes = data.attributes;
-        if (data.quests && Array.isArray(data.quests)) this.quests = data.quests;
-        if (data.regions && Array.isArray(data.regions)) this.regions = data.regions;
-        if (data.boss) this.boss = { ...this.boss, ...data.boss };
-        if (data.inventory && Array.isArray(data.inventory)) this.inventory = data.inventory;
-        if (data.badges && Array.isArray(data.badges)) this.badges = data.badges;
-        if (data.replayDays && Array.isArray(data.replayDays)) this.replayDays = data.replayDays;
+      if (cloudState) {
+        // Hydrate application state strictly from Firestore
+        if (cloudState.player) this.player = { ...this.player, ...cloudState.player };
+        if (cloudState.attributes) this.attributes = cloudState.attributes;
+        if (cloudState.quests && Array.isArray(cloudState.quests)) this.quests = cloudState.quests;
+        if (cloudState.regions && Array.isArray(cloudState.regions)) this.regions = cloudState.regions;
+        if (cloudState.boss) this.boss = { ...this.boss, ...cloudState.boss };
+        if (cloudState.inventory && Array.isArray(cloudState.inventory)) this.inventory = cloudState.inventory;
+        if (cloudState.badges && Array.isArray(cloudState.badges)) this.badges = cloudState.badges;
+        if (cloudState.replayDays && Array.isArray(cloudState.replayDays)) this.replayDays = cloudState.replayDays;
         this.syncStatus = 'synced';
         this.notify();
       } else {
+        // New authenticated user: initialize cloud state from defaults with their chosen callsign
         if (callsign) {
           this.player.username = callsign.toUpperCase();
         }
-        await setDoc(userRef, {
+        const initialCloudState: UserCloudState = {
           userId,
           callsign: callsign || this.player.username,
           createdAt: new Date().toISOString(),
@@ -129,14 +131,17 @@ class GameService {
           inventory: this.inventory,
           badges: this.badges,
           replayDays: this.replayDays
-        });
+        };
+
+        await firestoreService.saveUserState(userId, initialCloudState);
         this.syncStatus = 'synced';
         this.notify();
       }
 
-      // Live Firestore synchronization
+      // 2. Setup live real-time Firestore synchronization listener
+      const userDocRef = doc(db, 'users', userId);
       this.unsubscribeSnapshot = onSnapshot(
-        userRef,
+        userDocRef,
         (remoteSnap) => {
           if (remoteSnap.exists() && !remoteSnap.metadata.hasPendingWrites) {
             const remoteData = remoteSnap.data();
@@ -154,10 +159,13 @@ class GameService {
           this.notify();
         }
       );
+
+      return true;
     } catch (err) {
       console.error('Failed to bind user to Firestore:', err);
       this.syncStatus = 'error';
       this.notify();
+      return false;
     }
   }
 
@@ -177,23 +185,17 @@ class GameService {
     this.saveDebounceTimer = setTimeout(async () => {
       try {
         if (!this.currentUserId) return;
-        const userRef = doc(db, 'users', this.currentUserId);
-        await setDoc(
-          userRef,
-          {
-            userId: this.currentUserId,
-            updatedAt: new Date().toISOString(),
-            player: this.player,
-            attributes: this.attributes,
-            quests: this.quests,
-            regions: this.regions,
-            boss: this.boss,
-            inventory: this.inventory,
-            badges: this.badges,
-            replayDays: this.replayDays
-          },
-          { merge: true }
-        );
+        await firestoreService.saveUserState(this.currentUserId, {
+          userId: this.currentUserId,
+          player: this.player,
+          attributes: this.attributes,
+          quests: this.quests,
+          regions: this.regions,
+          boss: this.boss,
+          inventory: this.inventory,
+          badges: this.badges,
+          replayDays: this.replayDays
+        });
         this.syncStatus = 'synced';
         this.notify();
       } catch (err) {
@@ -368,6 +370,9 @@ class GameService {
     };
 
     this.lastCompletionEvent = eventPayload;
+    if (this.currentUserId) {
+      firestoreService.completeQuest(this.currentUserId, questId);
+    }
     this.persistToCloud();
     this.notify();
     return eventPayload;
@@ -383,6 +388,9 @@ class GameService {
     };
 
     this.quests = [newQuest, ...this.quests];
+    if (this.currentUserId) {
+      firestoreService.createQuest(this.currentUserId, newQuest);
+    }
     this.persistToCloud();
     this.notify();
     return newQuest;
@@ -394,6 +402,9 @@ class GameService {
     const beforeCount = this.quests.length;
     this.quests = this.quests.filter((q) => q.id !== questId);
     if (this.quests.length !== beforeCount) {
+      if (this.currentUserId) {
+        firestoreService.deleteQuest(this.currentUserId, questId);
+      }
       this.persistToCloud();
       this.notify();
       return true;
@@ -412,6 +423,9 @@ class GameService {
       ...updates
     };
 
+    if (this.currentUserId) {
+      firestoreService.updateQuest(this.currentUserId, questId, updates);
+    }
     this.persistToCloud();
     this.notify();
     return this.quests[idx];
@@ -469,6 +483,9 @@ class GameService {
       equipped: shouldAutoEquip
     };
 
+    if (this.currentUserId) {
+      firestoreService.saveInventory(this.currentUserId, this.inventory);
+    }
     this.persistToCloud();
     this.notify();
     return true;
@@ -495,6 +512,9 @@ class GameService {
       equipped: !item.equipped
     };
 
+    if (this.currentUserId) {
+      firestoreService.saveInventory(this.currentUserId, this.inventory);
+    }
     this.persistToCloud();
     this.notify();
     return true;

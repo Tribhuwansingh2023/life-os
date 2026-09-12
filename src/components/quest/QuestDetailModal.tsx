@@ -3,20 +3,22 @@ import { Quest } from '../../types';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Clock, Zap, Coins, CheckCircle, Tag, TrendingUp, Sparkles, Swords, Trash2 } from 'lucide-react';
+import { Clock, Zap, Coins, CheckCircle, Tag, TrendingUp, Sparkles, Swords, Trash2, Pencil } from 'lucide-react';
 
 interface QuestDetailModalProps {
   quest: Quest | null;
   onClose: () => void;
   onComplete: (id: string) => void;
   onDelete?: (id: string) => void;
+  onEdit?: (quest: Quest) => void;
 }
 
 export const QuestDetailModal: React.FC<QuestDetailModalProps> = ({
   quest,
   onClose,
   onComplete,
-  onDelete
+  onDelete,
+  onEdit
 }) => {
   if (!quest) return null;
 
@@ -159,6 +161,18 @@ export const QuestDetailModal: React.FC<QuestDetailModalProps> = ({
           ) : <div />}
 
           <div className="flex items-center gap-2">
+            {onEdit && !isCompleted && (
+              <Button
+                variant="outline"
+                icon={<Pencil className="w-4 h-4" />}
+                onClick={() => {
+                  onEdit(quest);
+                  onClose();
+                }}
+              >
+                EDIT QUEST
+              </Button>
+            )}
             <Button variant="ghost" onClick={onClose}>
               CLOSE
             </Button>
