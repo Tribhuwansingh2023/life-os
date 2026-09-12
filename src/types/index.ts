@@ -223,3 +223,20 @@ export interface OperatorUser {
   lastLoginAt?: string;
   photoURL?: string | null;
 }
+
+export interface ProfileRecord {
+  id: string;
+  username: string;
+  characterClass: string;
+  title: string;
+  level: number;
+  gold: number;
+  momentum: number;
+  streakDays: number;
+  createdAt: string;
+  player: PlayerProfile;
+  attributes: Record<string, AttributeInfo>;
+  quests: Quest[];
+  inventory: InventoryItem[];
+  badges: Badge[];
+}

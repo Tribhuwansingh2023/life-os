@@ -77,6 +77,10 @@ export function useGameState() {
     damageBoss: (amount: number) => gameService.damageBoss(amount),
     dismissCompletionModal: () => gameService.dismissCompletionModal(),
     resetToDefault: () => gameService.resetToDefault(),
-    dismissLevelUp: () => gameService.dismissLevelUpModal()
+    dismissLevelUp: () => gameService.dismissLevelUpModal(),
+    getProfiles: () => gameService.getProfiles(),
+    switchProfile: (profileId: string) => gameService.switchProfile(profileId),
+    createNewProfile: (name: string, characterClass?: string) => gameService.createNewProfile(name, characterClass),
+    deleteProfile: (profileId: string) => gameService.deleteProfile(profileId)
   };
 }

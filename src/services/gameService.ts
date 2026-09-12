@@ -8,7 +8,8 @@ import {
   Badge,
   OracleInsight,
   ReplayDay,
-  AttributeKey
+  AttributeKey,
+  ProfileRecord
 } from '../types';
 import {
   INITIAL_PLAYER,
@@ -634,6 +635,166 @@ class GameService {
     this.pendingLevelUp = null;
     this.persistToCloud();
     this.notify();
+  }
+
+  // --- Multi-Profile System ---
+  private STORAGE_PROFILES_KEY = 'lifeos_profiles_v1';
+
+  public getProfiles(): ProfileRecord[] {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_PROFILES_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch {
+      // Fallback
+    }
+
+    const defaultProfile: ProfileRecord = {
+      id: this.player.id || 'usr_initiate_01',
+      username: this.player.username,
+      characterClass: this.player.characterClass,
+      title: this.player.title,
+      level: this.player.level,
+      gold: this.player.gold,
+      momentum: this.player.momentum,
+      streakDays: this.player.streakDays,
+      createdAt: new Date().toISOString(),
+      player: { ...this.player },
+      attributes: JSON.parse(JSON.stringify(this.attributes)),
+      quests: JSON.parse(JSON.stringify(this.quests)),
+      inventory: JSON.parse(JSON.stringify(this.inventory)),
+      badges: JSON.parse(JSON.stringify(this.badges))
+    };
+
+    this.saveProfiles([defaultProfile]);
+    return [defaultProfile];
+  }
+
+  private saveProfiles(profiles: ProfileRecord[]) {
+    try {
+      localStorage.setItem(this.STORAGE_PROFILES_KEY, JSON.stringify(profiles));
+    } catch {
+      // LocalStorage fallback
+    }
+  }
+
+  public saveCurrentProfileState() {
+    const profiles = this.getProfiles();
+    const activeIdx = profiles.findIndex((p) => p.id === this.player.id);
+    const updatedRecord: ProfileRecord = {
+      id: this.player.id,
+      username: this.player.username,
+      characterClass: this.player.characterClass,
+      title: this.player.title,
+      level: this.player.level,
+      gold: this.player.gold,
+      momentum: this.player.momentum,
+      streakDays: this.player.streakDays,
+      createdAt: activeIdx >= 0 ? profiles[activeIdx].createdAt : new Date().toISOString(),
+      player: { ...this.player },
+      attributes: JSON.parse(JSON.stringify(this.attributes)),
+      quests: JSON.parse(JSON.stringify(this.quests)),
+      inventory: JSON.parse(JSON.stringify(this.inventory)),
+      badges: JSON.parse(JSON.stringify(this.badges))
+    };
+
+    if (activeIdx >= 0) {
+      profiles[activeIdx] = updatedRecord;
+    } else {
+      profiles.push(updatedRecord);
+    }
+
+    this.saveProfiles(profiles);
+  }
+
+  public switchProfile(profileId: string): boolean {
+    const profiles = this.getProfiles();
+    const target = profiles.find((p) => p.id === profileId);
+    if (!target) return false;
+
+    this.saveCurrentProfileState();
+
+    this.player = { ...target.player };
+    this.attributes = JSON.parse(JSON.stringify(target.attributes));
+    this.quests = JSON.parse(JSON.stringify(target.quests));
+    this.inventory = JSON.parse(JSON.stringify(target.inventory));
+    this.badges = JSON.parse(JSON.stringify(target.badges));
+
+    audioService.playTactileClick();
+    this.persistToCloud();
+    this.notify();
+    return true;
+  }
+
+  public createNewProfile(name: string, characterClass: string = 'Quantum Architect'): ProfileRecord {
+    audioService.playLevelUp();
+    this.saveCurrentProfileState();
+
+    const newId = `usr_profile_${Date.now()}`;
+    const newPlayer: PlayerProfile = {
+      ...INITIAL_PLAYER,
+      id: newId,
+      username: name.trim().toUpperCase() || 'ARCHITECT',
+      characterClass,
+      title: 'Initiate Architect',
+      level: 1,
+      currentXp: 0,
+      gold: 150,
+      momentum: 50,
+      streakDays: 1,
+      completedQuestsCount: 0
+    };
+
+    const newRecord: ProfileRecord = {
+      id: newId,
+      username: newPlayer.username,
+      characterClass,
+      title: newPlayer.title,
+      level: 1,
+      gold: 150,
+      momentum: 50,
+      streakDays: 1,
+      createdAt: new Date().toISOString(),
+      player: newPlayer,
+      attributes: JSON.parse(JSON.stringify(INITIAL_ATTRIBUTES)),
+      quests: JSON.parse(JSON.stringify(INITIAL_QUESTS)),
+      inventory: JSON.parse(JSON.stringify(INITIAL_INVENTORY)),
+      badges: JSON.parse(JSON.stringify(INITIAL_BADGES))
+    };
+
+    const profiles = this.getProfiles();
+    profiles.push(newRecord);
+    this.saveProfiles(profiles);
+
+    this.player = newPlayer;
+    this.attributes = JSON.parse(JSON.stringify(INITIAL_ATTRIBUTES));
+    this.quests = JSON.parse(JSON.stringify(INITIAL_QUESTS));
+    this.inventory = JSON.parse(JSON.stringify(INITIAL_INVENTORY));
+    this.badges = JSON.parse(JSON.stringify(INITIAL_BADGES));
+
+    this.persistToCloud();
+    this.notify();
+    return newRecord;
+  }
+
+  public deleteProfile(profileId: string): boolean {
+    const profiles = this.getProfiles();
+    if (profiles.length <= 1) return false;
+
+    const filtered = profiles.filter((p) => p.id !== profileId);
+    this.saveProfiles(filtered);
+
+    if (this.player.id === profileId) {
+      this.switchProfile(filtered[0].id);
+    } else {
+      this.notify();
+    }
+
+    return true;
   }
 }
 
