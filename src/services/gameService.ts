@@ -23,6 +23,8 @@ import {
 } from '../data/mockData';
 import { audioService } from './audioService';
 import confetti from 'canvas-confetti';
+import { doc, getDoc, setDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 export interface LevelUpEvent {
   oldLevel: number;
@@ -53,6 +55,11 @@ class GameService {
   private oracle: OracleInsight = { ...INITIAL_ORACLE };
   private replayDays: ReplayDay[] = JSON.parse(JSON.stringify(INITIAL_REPLAY_DAYS));
 
+  public currentUserId: string | null = null;
+  public syncStatus: 'synced' | 'syncing' | 'offline' | 'error' = 'offline';
+  private unsubscribeSnapshot: Unsubscribe | null = null;
+  private saveDebounceTimer: any = null;
+
   private listeners: Set<StateListener> = new Set();
   public lastCompletionEvent: QuestCompletionEvent | null = null;
   public pendingLevelUp: LevelUpEvent | null = null;
@@ -69,6 +76,132 @@ class GameService {
 
   private notify() {
     this.listeners.forEach((listener) => listener());
+  }
+
+  // Bind authenticated user to Firestore cloud document
+  public async bindUser(userId: string | null, callsign?: string) {
+    if (this.unsubscribeSnapshot) {
+      this.unsubscribeSnapshot();
+      this.unsubscribeSnapshot = null;
+    }
+
+    if (!userId) {
+      this.currentUserId = null;
+      this.syncStatus = 'offline';
+      this.notify();
+      return;
+    }
+
+    this.currentUserId = userId;
+    this.syncStatus = 'syncing';
+    this.notify();
+
+    try {
+      const userRef = doc(db, 'users', userId);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        if (data.player) this.player = { ...this.player, ...data.player };
+        if (data.attributes) this.attributes = data.attributes;
+        if (data.quests && Array.isArray(data.quests)) this.quests = data.quests;
+        if (data.regions && Array.isArray(data.regions)) this.regions = data.regions;
+        if (data.boss) this.boss = { ...this.boss, ...data.boss };
+        if (data.inventory && Array.isArray(data.inventory)) this.inventory = data.inventory;
+        if (data.badges && Array.isArray(data.badges)) this.badges = data.badges;
+        if (data.replayDays && Array.isArray(data.replayDays)) this.replayDays = data.replayDays;
+        this.syncStatus = 'synced';
+        this.notify();
+      } else {
+        if (callsign) {
+          this.player.username = callsign.toUpperCase();
+        }
+        await setDoc(userRef, {
+          userId,
+          callsign: callsign || this.player.username,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          player: this.player,
+          attributes: this.attributes,
+          quests: this.quests,
+          regions: this.regions,
+          boss: this.boss,
+          inventory: this.inventory,
+          badges: this.badges,
+          replayDays: this.replayDays
+        });
+        this.syncStatus = 'synced';
+        this.notify();
+      }
+
+      // Live Firestore synchronization
+      this.unsubscribeSnapshot = onSnapshot(
+        userRef,
+        (remoteSnap) => {
+          if (remoteSnap.exists() && !remoteSnap.metadata.hasPendingWrites) {
+            const remoteData = remoteSnap.data();
+            if (remoteData.player) this.player = { ...this.player, ...remoteData.player };
+            if (remoteData.quests) this.quests = remoteData.quests;
+            if (remoteData.attributes) this.attributes = remoteData.attributes;
+            if (remoteData.inventory) this.inventory = remoteData.inventory;
+            this.syncStatus = 'synced';
+            this.notify();
+          }
+        },
+        (err) => {
+          console.warn('Firestore snapshot error:', err);
+          this.syncStatus = 'error';
+          this.notify();
+        }
+      );
+    } catch (err) {
+      console.error('Failed to bind user to Firestore:', err);
+      this.syncStatus = 'error';
+      this.notify();
+    }
+  }
+
+  public getSyncStatus(): 'synced' | 'syncing' | 'offline' | 'error' {
+    return this.syncStatus;
+  }
+
+  public async persistToCloud() {
+    if (!this.currentUserId) return;
+    this.syncStatus = 'syncing';
+    this.notify();
+
+    if (this.saveDebounceTimer) {
+      clearTimeout(this.saveDebounceTimer);
+    }
+
+    this.saveDebounceTimer = setTimeout(async () => {
+      try {
+        if (!this.currentUserId) return;
+        const userRef = doc(db, 'users', this.currentUserId);
+        await setDoc(
+          userRef,
+          {
+            userId: this.currentUserId,
+            updatedAt: new Date().toISOString(),
+            player: this.player,
+            attributes: this.attributes,
+            quests: this.quests,
+            regions: this.regions,
+            boss: this.boss,
+            inventory: this.inventory,
+            badges: this.badges,
+            replayDays: this.replayDays
+          },
+          { merge: true }
+        );
+        this.syncStatus = 'synced';
+        this.notify();
+      } catch (err) {
+        console.error('Firestore persist error:', err);
+        this.syncStatus = 'error';
+        this.notify();
+      }
+    }, 250);
   }
 
   // Getters
@@ -115,32 +248,18 @@ class GameService {
 
   // Complete a quest with tactile feedback, progression calculation, and boss damage
   public completeQuest(questId: string): QuestCompletionEvent | null {
+    audioService.playTactileClick();
     const questIdx = this.quests.findIndex((q) => q.id === questId);
     if (questIdx === -1) return null;
 
     const quest = this.quests[questIdx];
     if (quest.status === 'completed') return null;
 
-    audioService.playQuestComplete();
-
-    // Fire celebratory particle burst
-    try {
-      confetti({
-        particleCount: 45,
-        spread: 60,
-        origin: { y: 0.7 },
-        colors: ['#00f0ff', '#8b5cf6', '#f59e0b', '#10b981']
-      });
-    } catch {
-      // Confetti fallback
-    }
-
-    // Calculate active equipment multipliers and perks
+    // Check equipped items perks for synergy boosts
     const equippedItems = this.inventory.filter((i) => i.equipped);
-    const hasFocusPrism = equippedItems.some((i) => i.id === 'item_01');
     const hasNeuralBand = equippedItems.some((i) => i.id === 'item_03');
-    const hasBracers = equippedItems.some((i) => i.id === 'item_07');
-    const hasSynergy = hasFocusPrism && hasNeuralBand; // Cognitive Overclock Synergy
+    const hasFocusPrism = equippedItems.some((i) => i.id === 'item_01');
+    const hasSynergy = hasFocusPrism && hasNeuralBand;
 
     let xpMultiplier = 1.0;
     if (hasNeuralBand) xpMultiplier += 0.10;
@@ -150,7 +269,7 @@ class GameService {
     const xpGained = Math.round(quest.xpReward * xpMultiplier);
     const goldGained = quest.goldReward;
     const momentumGained = quest.momentumBoost;
-    const bossDamage = xpGained; // 1 XP = 1 Boss DMG
+    const bossDamage = xpGained;
 
     // Update quest status
     this.quests[questIdx] = {
@@ -199,50 +318,35 @@ class GameService {
     this.player = {
       ...this.player,
       level: newLevel,
-      currentXp: newXp,
+      currentXp: Math.max(0, newXp),
       nextLevelXp: nextLevelThreshold,
       gold: newGold,
       momentum: newMomentum,
-      completedQuestsCount: this.player.completedQuestsCount + 1,
-      title: levelUpEvent?.unlockedTitle || this.player.title
+      completedQuestsCount: this.player.completedQuestsCount + 1
     };
 
-    // Update Attributes affected (with relic boosts)
+    // Attribute Gains
     quest.attributesAffected.forEach(({ attribute, gain }) => {
       const currentAttr = this.attributes[attribute];
       if (currentAttr) {
-        let effectiveGain = gain;
-        // Focus Prism relic: +15% Discipline and Intellect gains
-        if (hasFocusPrism && (attribute === 'discipline' || attribute === 'intellect')) {
-          effectiveGain = Math.round(gain * 1.15);
-        }
-        // Kinetic Wrist Bracers: +5% Strength gains
-        if (hasBracers && attribute === 'strength') {
-          effectiveGain = Math.round(gain * 1.05);
-        }
-
-        const newValue = Math.min(100, currentAttr.value + effectiveGain);
+        const newValue = Math.min(100, currentAttr.value + gain);
         const newAttrLevel = Math.floor(newValue / 5) + 1;
         this.attributes[attribute] = {
           ...currentAttr,
           value: newValue,
           level: newAttrLevel,
-          recentGain: currentAttr.recentGain + effectiveGain
+          recentGain: currentAttr.recentGain + gain
         };
       }
     });
 
-    // Update Boss battle
-    const updatedBossHp = Math.max(0, this.boss.currentHp - bossDamage);
+    // Boss damage
     this.boss = {
       ...this.boss,
-      currentHp: updatedBossHp
+      currentHp: Math.max(0, this.boss.currentHp - bossDamage)
     };
-    if (updatedBossHp === 0) {
-      audioService.playBossHit();
-    }
 
-    // Update Region influence
+    // Region influence boost
     const regionIdx = this.regions.findIndex((r) => r.id === quest.regionId);
     if (regionIdx !== -1) {
       const region = this.regions[regionIdx];
@@ -264,11 +368,12 @@ class GameService {
     };
 
     this.lastCompletionEvent = eventPayload;
+    this.persistToCloud();
     this.notify();
     return eventPayload;
   }
 
-  // Create new user-defined quest
+  // Create new user-defined quest (CRUD: Create)
   public createQuest(questData: Omit<Quest, 'id' | 'status'>): Quest {
     audioService.playTactileClick();
     const newQuest: Quest = {
@@ -278,8 +383,38 @@ class GameService {
     };
 
     this.quests = [newQuest, ...this.quests];
+    this.persistToCloud();
     this.notify();
     return newQuest;
+  }
+
+  // Delete an existing quest (CRUD: Delete)
+  public deleteQuest(questId: string): boolean {
+    audioService.playTactileClick();
+    const beforeCount = this.quests.length;
+    this.quests = this.quests.filter((q) => q.id !== questId);
+    if (this.quests.length !== beforeCount) {
+      this.persistToCloud();
+      this.notify();
+      return true;
+    }
+    return false;
+  }
+
+  // Update an existing quest (CRUD: Update)
+  public updateQuest(questId: string, updates: Partial<Quest>): Quest | null {
+    audioService.playTactileClick();
+    const idx = this.quests.findIndex((q) => q.id === questId);
+    if (idx === -1) return null;
+
+    this.quests[idx] = {
+      ...this.quests[idx],
+      ...updates
+    };
+
+    this.persistToCloud();
+    this.notify();
+    return this.quests[idx];
   }
 
   // Accept and prioritize quest recommended by Oracle
@@ -288,7 +423,6 @@ class GameService {
     const qIndex = this.quests.findIndex((q) => q.id === questId);
     if (qIndex === -1) return null;
 
-    // Set recommended flag and ensure status is active
     this.quests = this.quests.map((q) => ({
       ...q,
       isRecommendedByOracle: q.id === questId
@@ -300,37 +434,34 @@ class GameService {
       isRecommendedByOracle: true
     };
 
-    // Move to front of active quests stack
     this.quests.splice(qIndex, 1);
     this.quests.unshift(quest);
 
+    this.persistToCloud();
     this.notify();
     return quest;
   }
 
-  // Purchase item from inventory shop
+  // Purchase item from Armory
   public purchaseItem(itemId: string): boolean {
     const itemIdx = this.inventory.findIndex((i) => i.id === itemId);
     if (itemIdx === -1) return false;
 
     const item = this.inventory[itemIdx];
     if (item.purchased) return false;
-    if (this.player.gold < item.cost) return false;
-
-    // Progression gate check (e.g. Level Requirement)
-    if (item.unlockRequirement?.type === 'level' && this.player.level < Number(item.unlockRequirement.targetValue)) {
+    if (this.player.gold < item.cost) {
+      audioService.playError();
       return false;
     }
-
-    audioService.playGoldPurchase();
 
     this.player = {
       ...this.player,
       gold: this.player.gold - item.cost
     };
 
-    const currentlyEquippedCount = this.inventory.filter((i) => i.equipped).length;
-    const shouldAutoEquip = (item.category === 'gear' || item.category === 'artifact') && currentlyEquippedCount < 4;
+    const isTheme = item.category === 'theme';
+    const equippedCount = this.inventory.filter((i) => i.equipped).length;
+    const shouldAutoEquip = isTheme ? true : equippedCount < 4;
 
     this.inventory[itemIdx] = {
       ...item,
@@ -338,6 +469,7 @@ class GameService {
       equipped: shouldAutoEquip
     };
 
+    this.persistToCloud();
     this.notify();
     return true;
   }
@@ -363,11 +495,12 @@ class GameService {
       equipped: !item.equipped
     };
 
+    this.persistToCloud();
     this.notify();
     return true;
   }
 
-  // Update XP directly (in-memory)
+  // Update XP directly
   public updateXp(amount: number) {
     let newXp = this.player.currentXp + amount;
     let newLevel = this.player.level;
@@ -385,19 +518,21 @@ class GameService {
       currentXp: Math.max(0, newXp),
       nextLevelXp: nextThreshold
     };
+    this.persistToCloud();
     this.notify();
   }
 
-  // Update Gold directly (in-memory)
+  // Update Gold directly
   public updateGold(amount: number) {
     this.player = {
       ...this.player,
       gold: Math.max(0, this.player.gold + amount)
     };
+    this.persistToCloud();
     this.notify();
   }
 
-  // Update Quest Status directly (in-memory)
+  // Update Quest Status directly
   public updateQuestStatus(questId: string, status: Quest['status']) {
     const qIndex = this.quests.findIndex((q) => q.id === questId);
     if (qIndex === -1) return;
@@ -407,6 +542,7 @@ class GameService {
       status,
       completedAt: status === 'completed' ? new Date().toISOString() : undefined
     };
+    this.persistToCloud();
     this.notify();
   }
 
@@ -431,7 +567,6 @@ class GameService {
       }
     });
 
-    // Extra momentum bonus for challenging / extreme
     if (rating === 'challenging') {
       this.player = {
         ...this.player,
@@ -445,10 +580,11 @@ class GameService {
         gold: this.player.gold + 75
       };
     }
+    this.persistToCloud();
     this.notify();
   }
 
-  // Damage active boss (simulated or direct assault)
+  // Damage active boss
   public damageBoss(damageAmount: number) {
     const updatedHp = Math.max(0, this.boss.currentHp - damageAmount);
     this.boss = {
@@ -456,6 +592,7 @@ class GameService {
       currentHp: updatedHp
     };
     audioService.playBossHit();
+    this.persistToCloud();
     this.notify();
   }
 
@@ -478,6 +615,7 @@ class GameService {
       ...this.player,
       username: name.trim().toUpperCase()
     };
+    this.persistToCloud();
     this.notify();
   }
 
@@ -495,6 +633,7 @@ class GameService {
     this.replayDays = JSON.parse(JSON.stringify(INITIAL_REPLAY_DAYS));
     this.lastCompletionEvent = null;
     this.pendingLevelUp = null;
+    this.persistToCloud();
     this.notify();
   }
 }

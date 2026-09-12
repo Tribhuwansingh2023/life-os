@@ -6,6 +6,7 @@ import {
   setPersistence
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
 // Support both injected firebase-applet-config.json and optional VITE_ environment overrides
@@ -42,4 +43,19 @@ export const db =
   firestoreDatabaseId && firestoreDatabaseId !== '(default)'
     ? getFirestore(app, firestoreDatabaseId)
     : getFirestore(app);
+
+// Initialize Firebase Analytics safely (runs only in browser environments where supported)
+export let analytics: Analytics | null = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      try {
+        analytics = getAnalytics(app);
+      } catch (err) {
+        console.warn('Firebase Analytics initialization skipped:', err);
+      }
+    }
+  });
+}
+
 export default app;

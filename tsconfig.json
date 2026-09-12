@@ -15,6 +15,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
+    "types": ["vite/client", "node"],
     "jsx": "react-jsx",
     "paths": {
       "@/*": [

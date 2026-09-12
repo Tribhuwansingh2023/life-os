@@ -39,7 +39,7 @@ export const QuestsPage: React.FC<QuestsPageProps> = ({
   onInspectQuest,
   onOpenCreateQuest
 }) => {
-  const { player, attributes, boss, quests: gameQuests } = useGame();
+  const { player, attributes, boss, quests: gameQuests, deleteQuest } = useGame();
   const quests = gameQuests || propQuests;
 
   const [activeTab, setActiveTab] = useState<CategoryTab>('all');
@@ -405,6 +405,7 @@ export const QuestsPage: React.FC<QuestsPageProps> = ({
                   onToggleStart={handleToggleStart}
                   onComplete={onCompleteQuest}
                   onInspect={onInspectQuest}
+                  onDelete={deleteQuest}
                 />
               ))}
             </div>
