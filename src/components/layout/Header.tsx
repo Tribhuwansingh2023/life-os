@@ -281,9 +281,6 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Auth Modal */}
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-
       {/* Create Profile Name Modal */}
       {isCreateProfileModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden">
