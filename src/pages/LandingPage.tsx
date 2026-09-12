@@ -22,9 +22,13 @@ import {
   Heart,
   Lightbulb,
   Crosshair,
-  Volume2
+  Volume2,
+  User as UserIcon,
+  LogOut
 } from 'lucide-react';
 import { audioService } from '../services/audioService';
+import { useAuth } from '../context/AuthContext';
+import { AuthModal } from '../components/auth/AuthModal';
 
 interface LandingPageProps {
   onEnterApp: () => void;
@@ -114,6 +118,9 @@ const REGIONS: RegionData[] = [
 ];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
+  const { user, callsign, signOut } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   // Section 2: Real Life Transformation State
   const [selectedActivity, setSelectedActivity] = useState<ExampleActivity>('code');
   const [transformStep, setTransformStep] = useState<'real' | 'quest' | 'complete'>('quest');
@@ -259,6 +266,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           </nav>
 
           <div className="flex items-center gap-3">
+            {user ? (
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-xs font-mono text-cyan-300">
+                  <UserIcon className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="max-w-[100px] truncate">{callsign || user.email?.split('@')[0] || 'Operator'}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    audioService.playTactileClick();
+                    signOut();
+                  }}
+                  className="p-2 rounded-lg bg-white/[0.04] hover:bg-rose-500/20 border border-white/10 hover:border-rose-500/40 text-slate-400 hover:text-rose-300 transition-all cursor-pointer"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  audioService.playTactileClick();
+                  setIsAuthModalOpen(true);
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_12px_rgba(0,240,255,0.15)]"
+              >
+                <UserIcon className="w-3.5 h-3.5" />
+                <span>SIGN IN</span>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 audioService.playLevelUp();
@@ -320,10 +357,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                   audioService.playLevelUp();
                   onEnterApp();
                 }}
-                className="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_25px_rgba(0,240,255,0.3)] hover:shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-98"
+                className="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_25px_rgba(0,240,255,0.3)] hover:shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-98 cursor-pointer"
               >
                 <span>START YOUR JOURNEY</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+
+              <button
+                onClick={() => {
+                  audioService.playTactileClick();
+                  setIsAuthModalOpen(true);
+                }}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)]"
+              >
+                <UserIcon className="w-4 h-4 text-cyan-400" />
+                <span>SIGN IN / CREATE ACCOUNT</span>
               </button>
 
               <button
@@ -1358,6 +1406,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
           </div>
         </div>
       </footer>
+
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 };
