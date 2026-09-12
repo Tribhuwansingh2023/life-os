@@ -121,6 +121,16 @@ const REGIONS: RegionData[] = [
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
   const { user, callsign, signOut } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [showAuthCard, setShowAuthCard] = useState(false);
+
+  const openAuthCard = () => {
+    setShowAuthCard(true);
+    // Smooth scroll to the auth card after state update
+    setTimeout(() => {
+      const el = document.getElementById('auth-card-anchor');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+  };
 
   // Section 2: Real Life Transformation State
   const [selectedActivity, setSelectedActivity] = useState<ExampleActivity>('code');
@@ -288,7 +298,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
               <button
                 onClick={() => {
                   audioService.playTactileClick();
-                  setIsAuthModalOpen(true);
+                  openAuthCard();
                 }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/70 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_12px_rgba(0,240,255,0.15)]"
               >
@@ -351,29 +361,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
               </p>
             </div>
 
-            {/* CTAs */}
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
               <button
                 onClick={() => {
                   audioService.playLevelUp();
-                  onEnterApp();
+                  if (user) {
+                    onEnterApp();
+                  } else {
+                    openAuthCard();
+                  }
                 }}
                 className="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_25px_rgba(0,240,255,0.3)] hover:shadow-[0_0_35px_rgba(0,240,255,0.5)] active:scale-98 cursor-pointer"
               >
-                <span>START YOUR JOURNEY</span>
+                <span>{user ? 'ENTER COMMAND CENTER' : 'START YOUR JOURNEY'}</span>
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </button>
 
-              <button
-                onClick={() => {
-                  audioService.playTactileClick();
-                  setIsAuthModalOpen(true);
-                }}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)]"
-              >
-                <UserIcon className="w-4 h-4 text-cyan-400" />
-                <span>SIGN IN / CREATE ACCOUNT</span>
-              </button>
+              {!user && (
+                <button
+                  onClick={() => {
+                    audioService.playTactileClick();
+                    openAuthCard();
+                  }}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-lg bg-cyan-950/60 hover:bg-cyan-900/80 border border-cyan-500/40 text-cyan-300 hover:text-cyan-200 font-mono text-xs font-semibold tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(0,240,255,0.15)]"
+                >
+                  <UserIcon className="w-4 h-4 text-cyan-400" />
+                  <span>SIGN IN / CREATE ACCOUNT</span>
+                </button>
+              )}
 
               <button
                 onClick={() => scrollToSection('how-it-works')}
@@ -390,9 +405,69 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
             </p>
           </div>
 
-          {/* Right Column: Embedded Operator Access & Authentication Portal */}
-          <div className="lg:col-span-5">
-            <InlineAuthCard onEnterApp={onEnterApp} />
+          {/* Right Column: Auth card — revealed on demand */}
+          <div id="auth-card-anchor" className="lg:col-span-5">
+            <AnimatePresence mode="wait">
+              {showAuthCard ? (
+                <motion.div
+                  key="auth-card"
+                  initial={{ opacity: 0, y: 16, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                  transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
+                >
+                  <InlineAuthCard onEnterApp={onEnterApp} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="auth-teaser"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="rounded-2xl border border-white/[0.08] bg-[#0c111c]/80 backdrop-blur-sm p-8 flex flex-col items-center gap-6 text-center cursor-pointer group"
+                  onClick={() => openAuthCard()}
+                >
+                  {/* Logo / Icon */}
+                  <div className="w-16 h-16 rounded-2xl bg-[#0d131f] border border-cyan-500/30 flex items-center justify-center shadow-[0_0_30px_rgba(0,240,255,0.15)] group-hover:shadow-[0_0_40px_rgba(0,240,255,0.25)] transition-all">
+                    <span className="font-mono font-black text-cyan-400 text-2xl">//</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="font-mono font-bold text-white text-base tracking-wider">OPERATOR ACCESS PORTAL</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed">Sign in to sync your progress across devices and unlock cloud persistence.</p>
+                  </div>
+
+                  {/* Feature bullets */}
+                  <div className="w-full space-y-2 text-left">
+                    {[
+                      { icon: '⚡', text: 'Google Sign-In or Email' },
+                      { icon: '☁️', text: 'Cloud-synced across devices' },
+                      { icon: '👤', text: 'Guest mode — no sign-up needed' },
+                    ].map((item) => (
+                      <div key={item.text} className="flex items-center gap-2.5 text-xs text-slate-300">
+                        <span>{item.icon}</span>
+                        <span>{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={(e) => { e.stopPropagation(); audioService.playTactileClick(); openAuthCard(); }}
+                    className="w-full py-3 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-[#07090e] font-mono font-bold text-xs tracking-wider transition-all shadow-[0_0_20px_rgba(0,240,255,0.25)] hover:shadow-[0_0_30px_rgba(0,240,255,0.4)] cursor-pointer"
+                  >
+                    SIGN IN / CREATE ACCOUNT
+                  </button>
+
+                  <button
+                    onClick={(e) => { e.stopPropagation(); audioService.playLevelUp(); onEnterApp(); }}
+                    className="text-xs text-slate-500 hover:text-cyan-400 transition-colors font-mono cursor-pointer underline underline-offset-4"
+                  >
+                    Continue as Guest — no sign-up
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </section>
