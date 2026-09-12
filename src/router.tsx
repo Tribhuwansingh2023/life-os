@@ -28,7 +28,6 @@ import { OraclePage } from './pages/OraclePage';
 import { ReplayPage } from './pages/ReplayPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { SettingsPage } from './pages/SettingsPage';
-import { AuthPage } from './pages/AuthPage';
 
 // Meta tag updater helper
 function updateScreenMeta(title: string, description: string) {
@@ -430,20 +429,6 @@ const settingsRoute = createRoute({
   }
 });
 
-// Route 10: Operator Authentication (Redirects to Landing Page Embedded Login)
-const authRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/auth',
-  component: function AuthRoute() {
-    const navigate = useNavigate();
-    useEffect(() => {
-      navigate({ to: '/' });
-    }, [navigate]);
-
-    return <LandingPage onEnterApp={() => navigate({ to: '/command' })} />;
-  }
-});
-
 // Create Route Tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -455,8 +440,7 @@ const routeTree = rootRoute.addChildren([
   oracleRoute,
   replayRoute,
   inventoryRoute,
-  settingsRoute,
-  authRoute
+  settingsRoute
 ]);
 
 export const router = createRouter({
