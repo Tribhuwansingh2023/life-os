@@ -102,7 +102,8 @@ const commandRoute = createRoute({
       oracle: '/oracle',
       replay: '/replay',
       inventory: '/inventory',
-      settings: '/settings'
+      settings: '/settings',
+      auth: '/auth'
     };
 
     return (
@@ -215,7 +216,8 @@ const worldRoute = createRoute({
       oracle: '/oracle',
       replay: '/replay',
       inventory: '/inventory',
-      settings: '/settings'
+      settings: '/settings',
+      auth: '/auth'
     };
 
     return (
@@ -258,7 +260,8 @@ const oracleRoute = createRoute({
       oracle: '/oracle',
       replay: '/replay',
       inventory: '/inventory',
-      settings: '/settings'
+      settings: '/settings',
+      auth: '/auth'
     };
 
     return (
@@ -301,7 +304,8 @@ const replayRoute = createRoute({
       oracle: '/oracle',
       replay: '/replay',
       inventory: '/inventory',
-      settings: '/settings'
+      settings: '/settings',
+      auth: '/auth'
     };
 
     return (
