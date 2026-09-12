@@ -430,13 +430,13 @@ const settingsRoute = createRoute({
   }
 });
 
-// Route 10: Operator Authentication
+// Route 10: Operator Authentication Portal
 const authRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth',
   component: function AuthRoute() {
     useEffect(() => {
-      updateScreenMeta('Operator Auth', 'Sign in, register, or sync your LIFE//OS cloud progression.');
+      updateScreenMeta('Operator Login', 'Secure authentication and character session portal.');
     }, []);
 
     return <AuthPage />;
