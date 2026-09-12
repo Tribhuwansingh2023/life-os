@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
   User,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInAnonymously,
@@ -46,13 +47,18 @@ function mapFirebaseError(err: any): string {
     case 'auth/weak-password':
       return 'SECURITY_WARNING: Password cipher must be at least 6 characters.';
     case 'auth/popup-closed-by-user':
-      return 'NEURAL_HANDSHAKE_CANCELLED: Authentication window was closed before completion.';
+    case 'auth/cancelled-popup-request':
+      return 'NEURAL_HANDSHAKE_CANCELLED: Authentication was cancelled before completion.';
+    case 'auth/popup-blocked':
+      return 'POPUP_BLOCKED: Please allow popups or try again — redirecting to Google login.';
     case 'auth/network-request-failed':
       return 'TELEMETRY_FAILURE: Network connection interrupted during authentication.';
     case 'auth/too-many-requests':
       return 'RATE_THROTTLED: Too many failed access attempts. System locked temporarily.';
     case 'auth/configuration-not-found':
       return 'AUTH_CONFIG_NOTICE: Firebase auth provider pending setup in Firebase Console. You can also launch guest protocol.';
+    case 'auth/unauthorized-domain':
+      return 'DOMAIN_NOT_AUTHORIZED: This app domain is not registered in Firebase Console → Authentication → Settings → Authorized Domains. Add your Vercel domain to fix this.';
     default:
       return err.message || 'Access synchronization failed.';
   }
@@ -106,15 +112,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => unsubscribe();
   }, []);
 
+  // Handle redirect result from Google Sign-In (fires after returning from Google OAuth)
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user?.displayName) {
+          setCallsign(result.user.displayName);
+        }
+      })
+      .catch((err: any) => {
+        if (err?.code !== 'auth/no-current-user') {
+          console.error('Google redirect result error:', err);
+          setError(mapFirebaseError(err));
+        }
+      });
+  }, []);
+
   const clearError = () => setError(null);
 
   const signInWithGoogle = async () => {
     setError(null);
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      if (result.user.displayName) {
-        setCallsign(result.user.displayName);
-      }
+      // Use redirect flow — works in all browsers, never blocked by popup blockers
+      await signInWithRedirect(auth, googleProvider);
+      // After redirect returns, onAuthStateChanged + getRedirectResult handle the result
     } catch (err: any) {
       console.error('Google Sign-In failed:', err);
       const friendlyMsg = mapFirebaseError(err);
