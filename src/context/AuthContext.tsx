@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
   User,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
   signInWithEmailAndPassword,
@@ -50,7 +51,7 @@ function mapFirebaseError(err: any): string {
     case 'auth/cancelled-popup-request':
       return 'NEURAL_HANDSHAKE_CANCELLED: Authentication was cancelled before completion.';
     case 'auth/popup-blocked':
-      return 'POPUP_BLOCKED: Please allow popups or try again — redirecting to Google login.';
+      return 'POPUP_BLOCKED: Please allow popups for Google sign-in.';
     case 'auth/network-request-failed':
       return 'TELEMETRY_FAILURE: Network connection interrupted during authentication.';
     case 'auth/too-many-requests':
@@ -58,7 +59,7 @@ function mapFirebaseError(err: any): string {
     case 'auth/configuration-not-found':
       return 'AUTH_CONFIG_NOTICE: Firebase auth provider pending setup in Firebase Console. You can also launch guest protocol.';
     case 'auth/unauthorized-domain':
-      return 'DOMAIN_NOT_AUTHORIZED: This app domain is not registered in Firebase Console → Authentication → Settings → Authorized Domains. Add your Vercel domain to fix this.';
+      return 'DOMAIN_NOT_AUTHORIZED: This app domain is not registered in Firebase Console → Authentication → Settings → Authorized Domains. Add your domain to fix this.';
     default:
       return err.message || 'Access synchronization failed.';
   }
@@ -113,12 +114,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => unsubscribe();
   }, []);
 
-  // Handle redirect result from Google Sign-In (fires after returning from Google OAuth)
+  // Handle redirect result from Google Sign-In (if redirect flow was used)
   useEffect(() => {
     getRedirectResult(auth)
-      .then((result) => {
-        if (result?.user?.displayName) {
-          setCallsign(result.user.displayName);
+      .then(async (result) => {
+        if (result?.user) {
+          const derivedCallsign =
+            result.user.displayName ||
+            result.user.email?.split('@')[0] ||
+            'Operator';
+          setUser(result.user);
+          setCallsign(derivedCallsign);
+          setAuthState('AUTHENTICATED');
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('life_os_active_uid', result.user.uid);
+            sessionStorage.setItem('life_os_active_callsign', derivedCallsign);
+            if (result.user.email) sessionStorage.setItem('life_os_active_email', result.user.email);
+          }
+          await gameService.bindUser(result.user.uid, derivedCallsign);
         }
       })
       .catch((err: any) => {
@@ -145,10 +158,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       sessionStorage.removeItem('life_os_active_email');
     }
     try {
-      // Use redirect flow — works in all browsers, never blocked by popup blockers
-      await signInWithRedirect(auth, googleProvider);
-      // After redirect returns, onAuthStateChanged + getRedirectResult handle the result
+      // Use popup flow by default (instant authentication without page unloads)
+      const res = await signInWithPopup(auth, googleProvider);
+      if (res?.user) {
+        const derivedCallsign =
+          res.user.displayName ||
+          res.user.email?.split('@')[0] ||
+          'Operator';
+        setUser(res.user);
+        setCallsign(derivedCallsign);
+        setAuthState('AUTHENTICATED');
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('life_os_active_uid', res.user.uid);
+          sessionStorage.setItem('life_os_active_callsign', derivedCallsign);
+          if (res.user.email) sessionStorage.setItem('life_os_active_email', res.user.email);
+        }
+        await gameService.bindUser(res.user.uid, derivedCallsign);
+      }
     } catch (err: any) {
+      if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+        return; // User cancelled popup
+      }
+      if (err.code === 'auth/popup-blocked') {
+        // Fallback to redirect flow if popup was blocked
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          return;
+        } catch (redirectErr: any) {
+          const friendlyMsg = mapFirebaseError(redirectErr);
+          setError(friendlyMsg);
+          throw new Error(friendlyMsg);
+        }
+      }
       console.error('Google Sign-In failed:', err);
       const friendlyMsg = mapFirebaseError(err);
       setError(friendlyMsg);

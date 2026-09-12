@@ -73,6 +73,9 @@ export const InlineAuthCard: React.FC<InlineAuthCardProps> = ({ onEnterApp }) =>
       await signInWithGoogle();
       audioService.playLevelUp();
       setSuccessMsg('Google Identity Bound');
+      if (onEnterApp) {
+        onEnterApp();
+      }
     } catch {
       audioService.playBossHit();
     } finally {
