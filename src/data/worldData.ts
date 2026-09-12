@@ -327,7 +327,7 @@ export function getDynamicWorldNarrative(regions: WorldRegion[]): {
 
   if (sorted.every((r) => r.influenceScore >= 70)) {
     return {
-      headline: 'All 5 regions are resonating in harmony with your daily habits.',
+      headline: 'All 6 territories are resonating in harmony with your daily habits.',
       subtext: 'Your balanced real-life efforts have expanded all corners of your world.',
       highestRegion: highest,
       lowestRegion: lowest

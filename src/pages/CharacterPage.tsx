@@ -220,7 +220,7 @@ const BADGE_STORY_MAP: Record<string, BadgeStoryMeta> = {
   },
   bdg_06: {
     condition: '100% world mastery completed',
-    humanNote: 'Master of all five realms.'
+    humanNote: 'Master of all six territories.'
   }
 };
 
@@ -817,7 +817,7 @@ export const CharacterPage: React.FC<CharacterPageProps> = ({
                 NEXUS SOVEREIGN
               </h4>
               <p className="text-xs text-slate-400 font-sans mt-1">
-                Global momentum decay immunity and multi-domain resonance across all five realms.
+                Global momentum decay immunity and multi-domain resonance across all six territories.
               </p>
             </div>
           </div>
