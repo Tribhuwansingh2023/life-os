@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from '@tanstack/react-router';
 import {
   Shield,
   Lock,
@@ -12,13 +13,17 @@ import {
   LogOut,
   Eye,
   EyeOff,
-  RefreshCw
+  RefreshCw,
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useGame } from '../context/GameStateContext';
+import { audioService } from '../services/audioService';
 import { Button } from '../components/ui/Button';
 
 export const AuthPage: React.FC = () => {
+  const navigate = useNavigate();
   const {
     user,
     callsign,
@@ -51,6 +56,8 @@ export const AuthPage: React.FC = () => {
       } else {
         await signUpWithEmail(email, password, inputCallsign);
       }
+      audioService.playLevelUp();
+      navigate({ to: '/command' });
     } catch {
       // Handled in context
     } finally {
@@ -63,6 +70,8 @@ export const AuthPage: React.FC = () => {
     clearError();
     try {
       await signInWithGoogle();
+      audioService.playLevelUp();
+      navigate({ to: '/command' });
     } catch {
       // Handled
     } finally {
@@ -75,6 +84,8 @@ export const AuthPage: React.FC = () => {
     clearError();
     try {
       await signInAsGuest();
+      audioService.playLevelUp();
+      navigate({ to: '/command' });
     } catch {
       // Handled
     } finally {
@@ -83,12 +94,26 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-4 font-sans select-none">
+    <div className="min-h-[85vh] flex items-center justify-center p-4 font-sans select-none relative">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="w-full max-w-md space-y-6"
+        className="w-full max-w-md space-y-4"
       >
+        {/* Back to landing page navigation link */}
+        <div className="flex items-center justify-between px-1">
+          <button
+            onClick={() => {
+              audioService.playTactileClick();
+              navigate({ to: '/' });
+            }}
+            className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-400 hover:text-cyan-400 transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Landing Page</span>
+          </button>
+        </div>
+
         {user ? (
           /* Active Authenticated Session Card */
           <div className="relative overflow-hidden rounded-3xl bg-[#07090f]/95 border border-cyan-500/30 p-6 sm:p-8 shadow-[0_0_50px_rgba(0,240,255,0.15)] text-slate-100 font-mono backdrop-blur-xl space-y-6">
@@ -124,12 +149,28 @@ export const AuthPage: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              onClick={() => signOut()}
-              className="w-full py-3 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-xs font-bold uppercase tracking-wider transition-all"
-            >
-              <LogOut className="w-4 h-4 mr-2 inline" /> DISCONNECT SESSION
-            </Button>
+            <div className="space-y-3 pt-2">
+              <Button
+                onClick={() => {
+                  audioService.playLevelUp();
+                  navigate({ to: '/command' });
+                }}
+                className="w-full py-3.5 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-black font-mono text-xs font-bold uppercase tracking-wider shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>LAUNCH COMMAND CENTER</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+
+              <Button
+                onClick={() => {
+                  audioService.playTactileClick();
+                  signOut();
+                }}
+                className="w-full py-2.5 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-rose-400 font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 mr-2 inline" /> DISCONNECT SESSION
+              </Button>
+            </div>
           </div>
         ) : (
           /* Unauthenticated Clean Auth Card */
@@ -159,7 +200,7 @@ export const AuthPage: React.FC = () => {
                   setMode('signin');
                   clearError();
                 }}
-                className={`py-2.5 rounded-xl font-bold tracking-wider transition-all ${
+                className={`py-2.5 rounded-xl font-bold tracking-wider transition-all cursor-pointer ${
                   mode === 'signin'
                     ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20'
                     : 'text-slate-400 hover:text-white'
@@ -173,7 +214,7 @@ export const AuthPage: React.FC = () => {
                   setMode('signup');
                   clearError();
                 }}
-                className={`py-2.5 rounded-xl font-bold tracking-wider transition-all ${
+                className={`py-2.5 rounded-xl font-bold tracking-wider transition-all cursor-pointer ${
                   mode === 'signup'
                     ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20'
                     : 'text-slate-400 hover:text-white'
@@ -196,7 +237,7 @@ export const AuthPage: React.FC = () => {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isSubmitting}
-              className="flex items-center justify-center w-full py-3 px-4 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-cyan-500/50 hover:bg-white/[0.08] text-sm font-semibold transition-all group shadow-md"
+              className="flex items-center justify-center w-full py-3 px-4 rounded-2xl bg-white/[0.04] border border-white/15 hover:border-cyan-500/50 hover:bg-white/[0.08] text-sm font-semibold transition-all group shadow-md cursor-pointer"
             >
               <svg className="w-4 h-4 mr-3" viewBox="0 0 24 24">
                 <path
@@ -284,7 +325,7 @@ export const AuthPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300"
+                    className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -294,7 +335,7 @@ export const AuthPage: React.FC = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3.5 mt-2 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-black font-extrabold font-mono tracking-widest text-xs uppercase shadow-lg shadow-cyan-500/20 transition-all"
+                className="w-full py-3.5 mt-2 bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-black font-extrabold font-mono tracking-widest text-xs uppercase shadow-lg shadow-cyan-500/20 transition-all cursor-pointer"
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
@@ -318,7 +359,7 @@ export const AuthPage: React.FC = () => {
                 type="button"
                 onClick={handleGuestSignIn}
                 disabled={isSubmitting}
-                className="w-full py-2.5 px-3 rounded-2xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 group"
+                className="w-full py-2.5 px-3 rounded-2xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold transition-all flex items-center justify-center gap-2 group cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-cyan-400 group-hover:rotate-12 transition-transform" />
                 <span>INSTANT GUEST AGENT ACCESS (NO SIGN-UP)</span>
@@ -330,3 +371,4 @@ export const AuthPage: React.FC = () => {
     </div>
   );
 };
+

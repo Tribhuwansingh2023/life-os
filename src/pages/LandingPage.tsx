@@ -118,7 +118,7 @@ const REGIONS: RegionData[] = [
 ];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
-  const { user, callsign, signOut } = useAuth();
+  const { user, callsign, signOut, signInAsGuest } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [showAuthCard, setShowAuthCard] = useState(false);
 
@@ -459,7 +459,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterApp }) => {
                   </button>
 
                   <button
-                    onClick={(e) => { e.stopPropagation(); audioService.playLevelUp(); onEnterApp(); }}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      audioService.playLevelUp();
+                      if (!user) {
+                        try {
+                          await signInAsGuest();
+                        } catch {
+                          // Continue into app even if guest initialization encounters local network issue
+                        }
+                      }
+                      onEnterApp();
+                    }}
                     className="text-xs text-slate-500 hover:text-cyan-400 transition-colors font-mono cursor-pointer underline underline-offset-4"
                   >
                     Continue as Guest — no sign-up
