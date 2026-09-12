@@ -122,7 +122,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       })
       .catch((err: any) => {
-        if (err?.code !== 'auth/no-current-user') {
+        // These codes are expected on normal page loads when no redirect is pending — suppress them
+        const suppressedCodes = [
+          'auth/no-current-user',
+          'auth/configuration-not-found',
+          'auth/null-user',
+        ];
+        if (!suppressedCodes.includes(err?.code)) {
           console.error('Google redirect result error:', err);
           setError(mapFirebaseError(err));
         }
