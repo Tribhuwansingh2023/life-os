@@ -29,6 +29,7 @@ interface QuestsPageProps {
   onCompleteQuest: (id: string) => void;
   onInspectQuest: (quest: Quest) => void;
   onOpenCreateQuest: () => void;
+  onEditQuest?: (quest: Quest) => void;
 }
 
 type CategoryTab = 'all' | QuestType | 'completed';
@@ -37,7 +38,8 @@ export const QuestsPage: React.FC<QuestsPageProps> = ({
   quests: propQuests,
   onCompleteQuest,
   onInspectQuest,
-  onOpenCreateQuest
+  onOpenCreateQuest,
+  onEditQuest
 }) => {
   const { player, attributes, boss, quests: gameQuests, deleteQuest } = useGame();
   const quests = gameQuests || propQuests;
@@ -406,6 +408,7 @@ export const QuestsPage: React.FC<QuestsPageProps> = ({
                   onComplete={onCompleteQuest}
                   onInspect={onInspectQuest}
                   onDelete={deleteQuest}
+                  onEdit={onEditQuest}
                 />
               ))}
             </div>

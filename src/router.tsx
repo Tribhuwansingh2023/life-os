@@ -16,6 +16,7 @@ import { Layout } from './components/layout/Layout';
 // Modals
 import { CreateQuestModal } from './components/quest/CreateQuestModal';
 import { QuestDetailModal } from './components/quest/QuestDetailModal';
+import { EditQuestModal } from './components/quest/EditQuestModal';
 
 // Pages
 import { LandingPage } from './pages/LandingPage';
@@ -76,6 +77,7 @@ const commandRoute = createRoute({
   component: function CommandRoute() {
     const navigate = useNavigate();
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
+    const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
     const [isForgeOpen, setIsForgeOpen] = useState(false);
     const {
       player,
@@ -88,7 +90,8 @@ const commandRoute = createRoute({
       completeQuest,
       damageBoss,
       createQuest,
-      deleteQuest
+      deleteQuest,
+      updateQuest
     } = useGame();
 
     useEffect(() => {
@@ -129,11 +132,18 @@ const commandRoute = createRoute({
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
           onDelete={(id) => deleteQuest(id)}
+          onEdit={(quest) => setEditingQuest(quest)}
         />
         <CreateQuestModal
           isOpen={isForgeOpen}
           onClose={() => setIsForgeOpen(false)}
           onCreateQuest={(qData) => createQuest(qData)}
+        />
+        <EditQuestModal
+          isOpen={Boolean(editingQuest)}
+          quest={editingQuest}
+          onClose={() => setEditingQuest(null)}
+          onSave={(id, updates) => updateQuest(id, updates)}
         />
       </>
     );
@@ -146,8 +156,9 @@ const questsRoute = createRoute({
   path: '/quests',
   component: function QuestsRoute() {
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
+    const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
     const [isForgeOpen, setIsForgeOpen] = useState(false);
-    const { quests, completeQuest, createQuest, deleteQuest } = useGame();
+    const { quests, completeQuest, createQuest, deleteQuest, updateQuest } = useGame();
 
     useEffect(() => {
       updateScreenMeta('Quest Matrix', 'Turn real-life goals into quests, rewards, and progression.');
@@ -160,17 +171,25 @@ const questsRoute = createRoute({
           onCompleteQuest={(id) => completeQuest(id)}
           onInspectQuest={(quest) => setInspectedQuest(quest)}
           onOpenCreateQuest={() => setIsForgeOpen(true)}
+          onEditQuest={(quest) => setEditingQuest(quest)}
         />
         <QuestDetailModal
           quest={inspectedQuest}
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
           onDelete={(id) => deleteQuest(id)}
+          onEdit={(quest) => setEditingQuest(quest)}
         />
         <CreateQuestModal
           isOpen={isForgeOpen}
           onClose={() => setIsForgeOpen(false)}
           onCreateQuest={(qData) => createQuest(qData)}
+        />
+        <EditQuestModal
+          isOpen={Boolean(editingQuest)}
+          quest={editingQuest}
+          onClose={() => setEditingQuest(null)}
+          onSave={(id, updates) => updateQuest(id, updates)}
         />
       </>
     );
@@ -205,7 +224,8 @@ const worldRoute = createRoute({
   component: function WorldRoute() {
     const navigate = useNavigate();
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
-    const { regions, quests, completeQuest, deleteQuest } = useGame();
+    const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+    const { regions, quests, completeQuest, deleteQuest, updateQuest } = useGame();
 
     useEffect(() => {
       updateScreenMeta('Biosystem World Map', 'Dynamic topological biomes shaped by real-world habit consistency.');
@@ -237,6 +257,13 @@ const worldRoute = createRoute({
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
           onDelete={(id) => deleteQuest(id)}
+          onEdit={(quest) => setEditingQuest(quest)}
+        />
+        <EditQuestModal
+          isOpen={Boolean(editingQuest)}
+          quest={editingQuest}
+          onClose={() => setEditingQuest(null)}
+          onSave={(id, updates) => updateQuest(id, updates)}
         />
       </>
     );
@@ -250,7 +277,8 @@ const oracleRoute = createRoute({
   component: function OracleRoute() {
     const navigate = useNavigate();
     const [inspectedQuest, setInspectedQuest] = useState<Quest | null>(null);
-    const { oracle, quests, completeQuest, deleteQuest } = useGame();
+    const [editingQuest, setEditingQuest] = useState<Quest | null>(null);
+    const { oracle, quests, completeQuest, deleteQuest, updateQuest } = useGame();
 
     useEffect(() => {
       updateScreenMeta('Oracle AI Game Master', 'Your progress, analyzed. Your next move, recommended.');
@@ -282,6 +310,13 @@ const oracleRoute = createRoute({
           onClose={() => setInspectedQuest(null)}
           onComplete={(id) => completeQuest(id)}
           onDelete={(id) => deleteQuest(id)}
+          onEdit={(quest) => setEditingQuest(quest)}
+        />
+        <EditQuestModal
+          isOpen={Boolean(editingQuest)}
+          quest={editingQuest}
+          onClose={() => setEditingQuest(null)}
+          onSave={(id, updates) => updateQuest(id, updates)}
         />
       </>
     );
@@ -395,16 +430,28 @@ const settingsRoute = createRoute({
   }
 });
 
+<<<<<<< HEAD
 // Route 10: User Auth & Cloud Security Portal
+=======
+// Route 10: Operator Authentication
+>>>>>>> origin/main
 const authRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth',
   component: function AuthRoute() {
+<<<<<<< HEAD
     useEffect(() => {
       updateScreenMeta('User Auth & Security Portal', 'Secure authentication, session management, and per-user cloud document isolation.');
     }, []);
 
     return <AuthPage />;
+=======
+    const navigate = useNavigate();
+    useEffect(() => {
+      updateScreenMeta('Initialize Operator', 'Authenticate to synchronize your LIFE//OS progression across neural clouds.');
+    }, []);
+    return <AuthPage onViewLanding={() => navigate({ to: '/' })} />;
+>>>>>>> origin/main
   }
 });
 

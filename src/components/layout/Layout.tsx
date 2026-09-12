@@ -131,7 +131,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="w-full min-h-screen"
+          className="w-full min-h-dvh"
         >
           {children || <Outlet />}
           <LevelUpModal levelUpEvent={pendingLevelUp} onDismiss={dismissLevelUp} />
@@ -141,7 +141,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col lg:flex-row cyber-grid relative overflow-x-hidden" id="app-root-layout">
+    <div className="min-h-dvh bg-[#07090e] text-slate-100 flex flex-col lg:flex-row cyber-grid relative" id="app-root-layout">
       {/* Subtle top ambient quantum scan indicator */}
       <motion.div
         key={`scan-${pathname}`}
@@ -167,8 +167,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         />
       </motion.aside>
 
-      {/* 2. Main Content Viewport */}
-      <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
+      {/* 2. Main Content Viewport — flex-1 grows, min-w-0 prevents overflow */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Persistent Top Header with entrance */}
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -185,8 +185,15 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           />
         </motion.div>
 
-        {/* Animated Screen Transition Stage */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto" role="main">
+        {/* Animated Screen Transition Stage
+             - pb-16 lg:pb-0: pads above fixed mobile nav
+             - max-w-7xl: constrains content width
+             - w-full: takes up all available width
+             - No overflow-y-auto here — body is the scroller */}
+        <main
+          className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 lg:pb-8 max-w-7xl w-full mx-auto"
+          role="main"
+        >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={pathname}
@@ -197,7 +204,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 duration: 0.2,
                 ease: [0.25, 1, 0.5, 1]
               }}
-              className="w-full h-full"
+              className="w-full"
             >
               {children || <Outlet />}
             </motion.div>

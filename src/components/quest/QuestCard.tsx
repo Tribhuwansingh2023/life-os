@@ -19,7 +19,8 @@ import {
   HelpCircle,
   ArrowRight,
   Info,
-  Trash2
+  Trash2,
+  Pencil
 } from 'lucide-react';
 import { audioService } from '../../services/audioService';
 
@@ -28,6 +29,7 @@ interface QuestCardProps {
   onComplete: (id: string) => void;
   onInspect: (quest: Quest) => void;
   onDelete?: (id: string) => void;
+  onEdit?: (quest: Quest) => void;
   isInProgress?: boolean;
   onToggleStart?: (id: string) => void;
   className?: string;
@@ -140,6 +142,7 @@ export const QuestCard: React.FC<QuestCardProps> = ({
   onComplete,
   onInspect,
   onDelete,
+  onEdit,
   isInProgress = false,
   onToggleStart,
   className = ''
@@ -257,6 +260,21 @@ export const QuestCard: React.FC<QuestCardProps> = ({
               <Clock className="w-3 h-3 text-slate-400" />
               <span>{quest.timeEstimateMinutes} min</span>
             </div>
+            {onEdit && !isCompleted && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  audioService.playTactileClick();
+                  onEdit(quest);
+                }}
+                title="Edit Quest Parameters"
+                className="opacity-0 group-hover:opacity-100 p-1 rounded text-slate-500 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all cursor-pointer"
+                aria-label="Edit Quest"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
             {onDelete && (
               <button
                 type="button"

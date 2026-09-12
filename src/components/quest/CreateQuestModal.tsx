@@ -474,7 +474,7 @@ export const CreateQuestModal: React.FC<CreateQuestModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden">
       {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -483,14 +483,16 @@ export const CreateQuestModal: React.FC<CreateQuestModalProps> = ({
         onClick={handleAttemptClose}
         className="fixed inset-0 bg-black/80 backdrop-blur-sm"
       />
-
+      {/* Centering wrapper */}
+      <div className="flex min-h-full items-center justify-center p-3 sm:p-6">
       {/* Main Dialog */}
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
-        className="relative w-full max-w-4xl bg-[#090d15] border border-cyan-500/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-10 overflow-hidden my-4 sm:my-8"
+        className="relative w-full max-w-4xl bg-[#090d15] border border-cyan-500/30 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.85)] z-10 overflow-hidden my-4 sm:my-8 flex flex-col"
+        style={{ maxHeight: '90dvh' }}
         id="create-quest-modal-container"
         role="dialog"
         aria-modal="true"
@@ -609,7 +611,8 @@ export const CreateQuestModal: React.FC<CreateQuestModalProps> = ({
         </AnimatePresence>
 
         {/* Modal Scrollable Body */}
-        <div className="p-5 sm:p-7 max-h-[78vh] overflow-y-auto">
+        <div className="flex-1 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+        <div className="p-5 sm:p-7">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Desktop 2-column layout: Left = Form Fields, Right = Live Quest Preview */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1256,7 +1259,9 @@ export const CreateQuestModal: React.FC<CreateQuestModalProps> = ({
             </div>
           </form>
         </div>
+        </div>
       </motion.div>
+      </div>
     </div>
   );
 };

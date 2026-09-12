@@ -11,19 +11,52 @@
     --bg-elevated: #141b26;
     --border-subtle: rgba(255, 255, 255, 0.08);
     --border-accent: rgba(0, 240, 255, 0.3);
-    
+
     --accent-cyan: #00f0ff;
     --accent-violet: #8b5cf6;
     --accent-amber: #f59e0b;
     --accent-emerald: #10b981;
     --accent-rose: #f43f5e;
+
+    /* Mobile bottom nav safe padding */
+    --mobile-nav-height: 64px;
+  }
+
+  /* ========================================
+     GLOBAL SCROLL ARCHITECTURE
+     
+     Strategy: body is the ONE natural scroller.
+     - html/body/#root allow natural content flow.
+     - No height:100vh trap on any container.
+     - Sidebar is sticky via position:sticky.
+     - Mobile nav is fixed at bottom.
+     - Pages grow naturally, body scrolls.
+     ======================================== */
+
+  html {
+    min-height: 100%;
+    /* Prevent horizontal overflow at the document level */
+    overflow-x: hidden;
+    /* Smooth keyboard/anchor scrolling */
+    scroll-behavior: smooth;
   }
 
   body {
     font-family: var(--font-sans);
     background-color: var(--bg-base);
     color: #e2e8f0;
+    min-height: 100dvh;
+    /* Allow natural vertical scroll — do NOT add overflow:hidden here */
     overflow-x: hidden;
+    /* Prevent width jitter when modal locks scroll */
+    scrollbar-gutter: stable;
+  }
+
+  /* Root mounts full-height but grows with content */
+  #root {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
 
   code, kbd, samp, pre {
@@ -31,20 +64,51 @@
   }
 }
 
-/* Custom Scrollbar for cyber RPG feel */
+/* ==========================================
+   CYBER RPG SCROLLBAR — primary containers
+   Only applied to the scrollbar of actual
+   scroll hosts (body, modals, sidebars).
+   ========================================== */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #090c12;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e2638;
-  border-radius: 3px;
+  background: rgba(0, 240, 255, 0.15);
+  border-radius: 100px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f0ff88;
+  background: rgba(0, 240, 255, 0.45);
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.15) transparent;
+}
+
+/* ==========================================
+   LAYOUT HELPERS
+   ========================================== */
+
+/* The app shell when sidebar + main are rendered side-by-side.
+   Uses min-h-dvh instead of h-screen to allow natural growth. */
+.app-shell {
+  display: flex;
+  min-height: 100dvh;
+}
+
+/* Flex children that contain scrollable content MUST have min-height:0
+   to allow shrinking below their natural content size in a flex column. */
+.flex-shrink-child {
+  min-height: 0;
+  min-width: 0;
 }
 
 /* Subtle Glow Effects */
@@ -81,3 +145,28 @@
               radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.06) 0%, transparent 45%),
               radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
 }
+
+/* ==========================================
+   MODAL SCROLL HELPERS
+   ========================================== */
+
+/* When any modal is open, body scroll is locked by JS (Modal.tsx).
+   The scrollbar-gutter:stable above prevents layout shift on lock. */
+
+/* Modal inner content scroll area */
+.modal-body-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ==========================================
+   MOBILE SAFE AREA
+   ========================================== */
+
+/* Add bottom padding equal to mobile nav on mobile breakpoints */
+@media (max-width: 1023px) {
+  .mobile-nav-safe-padding {
+    padding-bottom: var(--mobile-nav-height);
+  }
+}
+

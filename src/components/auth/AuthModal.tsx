@@ -65,12 +65,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+      <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden">
+        {/* Backdrop */}
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
+        {/* Centering wrapper */}
+        <div className="flex min-h-full items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="relative w-full max-w-md p-6 overflow-hidden rounded-2xl bg-[#0a0d14] border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 text-slate-100"
+          className="relative w-full max-w-md p-6 overflow-hidden rounded-2xl bg-[#0a0d14] border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 text-slate-100 my-8"
+          style={{ maxHeight: '90dvh', overflowY: 'auto', overscrollBehavior: 'contain' }}
         >
           {/* Top glowing edge bar */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-violet-500 to-amber-400" />
@@ -261,6 +266,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             </button>
           </div>
         </motion.div>
+        </div>
       </div>
     </AnimatePresence>
   );

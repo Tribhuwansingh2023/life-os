@@ -287,8 +287,10 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Create Profile Name Modal */}
       {isCreateProfileModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="relative w-full max-w-sm p-5 rounded-2xl bg-[#0a0d14] border border-cyan-500/30 text-slate-100 font-mono shadow-2xl">
+        <div className="fixed inset-0 z-50 overflow-y-auto overflow-x-hidden">
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsCreateProfileModalOpen(false)} />
+          <div className="flex min-h-full items-center justify-center p-4">
+          <div className="relative w-full max-w-sm p-5 rounded-2xl bg-[#0a0d14] border border-cyan-500/30 text-slate-100 font-mono shadow-2xl my-8">
             <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
               <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm">
                 <UserPlus className="w-4 h-4" />
@@ -350,6 +352,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
             </form>
+          </div>
           </div>
         </div>
       )}

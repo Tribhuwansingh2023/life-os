@@ -12,9 +12,12 @@ import {
 import { auth, googleProvider } from '../lib/firebase';
 import { gameService } from '../services/gameService';
 
+export type AuthState = 'AUTH_LOADING' | 'AUTHENTICATED' | 'UNAUTHENTICATED';
+
 export interface AuthContextValue {
   user: User | null;
   callsign: string;
+  authState: AuthState;
   loading: boolean;
   error: string | null;
   clearError: () => void;
@@ -27,29 +30,77 @@ export interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+function mapFirebaseError(err: any): string {
+  if (!err) return 'An unknown authentication error occurred';
+  const code = err.code || '';
+  switch (code) {
+    case 'auth/invalid-email':
+      return 'OPERATOR_ID_INVALID: The provided email format is invalid.';
+    case 'auth/user-not-found':
+      return 'OPERATOR_NOT_FOUND: No neural profile found for this email identifier.';
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'AUTHENTICATION_FAILED: Invalid credentials or cipher key provided.';
+    case 'auth/email-already-in-use':
+      return 'ID_COLLISION: An operator account is already registered with this email address.';
+    case 'auth/weak-password':
+      return 'SECURITY_WARNING: Password cipher must be at least 6 characters.';
+    case 'auth/popup-closed-by-user':
+      return 'NEURAL_HANDSHAKE_CANCELLED: Authentication window was closed before completion.';
+    case 'auth/network-request-failed':
+      return 'TELEMETRY_FAILURE: Network connection interrupted during authentication.';
+    case 'auth/too-many-requests':
+      return 'RATE_THROTTLED: Too many failed access attempts. System locked temporarily.';
+    case 'auth/configuration-not-found':
+      return 'AUTH_CONFIG_NOTICE: Firebase auth provider pending setup in Firebase Console. You can also launch guest protocol.';
+    default:
+      return err.message || 'Access synchronization failed.';
+  }
+}
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [callsign, setCallsign] = useState<string>('Operator-01');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [authState, setAuthState] = useState<AuthState>('AUTH_LOADING');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
       if (currentUser) {
+        setUser(currentUser);
         const derivedCallsign =
           currentUser.displayName ||
           currentUser.email?.split('@')[0] ||
           (currentUser.isAnonymous ? 'Guest-Agent' : 'Operator');
         setCallsign(derivedCallsign);
-        // Bind player game service to this user's isolated cloud document
+        setAuthState('AUTHENTICATED');
+
+        // Bind and strictly hydrate state from Firestore
         await gameService.bindUser(currentUser.uid, derivedCallsign);
       } else {
-        setCallsign('Operator-01');
-        // Unbind / fallback to local demo
-        gameService.bindUser(null, 'Operator-01');
+        // Check for active guest session
+        const cachedGuestUid = typeof window !== 'undefined' ? sessionStorage.getItem('life_os_active_uid') : null;
+        const cachedGuestCallsign = typeof window !== 'undefined' ? sessionStorage.getItem('life_os_active_callsign') : null;
+
+        if (cachedGuestUid) {
+          const guestCallsign = cachedGuestCallsign || 'Agent-Guest';
+          setUser({
+            uid: cachedGuestUid,
+            displayName: guestCallsign,
+            isAnonymous: true,
+            email: null,
+            emailVerified: false
+          } as any);
+          setCallsign(guestCallsign);
+          setAuthState('AUTHENTICATED');
+          await gameService.bindUser(cachedGuestUid, guestCallsign);
+        } else {
+          setUser(null);
+          setCallsign('Operator-01');
+          await gameService.bindUser(null, 'Operator-01');
+          setAuthState('UNAUTHENTICATED');
+        }
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -66,8 +117,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (err: any) {
       console.error('Google Sign-In failed:', err);
-      setError(err.message || 'Google authentication failed');
-      throw err;
+      const friendlyMsg = mapFirebaseError(err);
+      setError(friendlyMsg);
+      throw new Error(friendlyMsg);
     }
   };
 
@@ -80,8 +132,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     } catch (err: any) {
       console.error('Email sign-in failed:', err);
-      setError(err.message || 'Invalid email or password');
-      throw err;
+      const friendlyMsg = mapFirebaseError(err);
+      setError(friendlyMsg);
+      throw new Error(friendlyMsg);
     }
   };
 
@@ -94,36 +147,46 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setCallsign(cleanCallsign);
     } catch (err: any) {
       console.error('Email sign-up failed:', err);
-      setError(err.message || 'Account registration failed');
-      throw err;
+      const friendlyMsg = mapFirebaseError(err);
+      setError(friendlyMsg);
+      throw new Error(friendlyMsg);
     }
   };
 
   const signInAsGuest = async () => {
     setError(null);
+    const guestCallsign = `Agent-${Math.floor(1000 + Math.random() * 9000)}`;
     try {
       const res = await signInAnonymously(auth);
-      const guestCallsign = `Agent-${Math.floor(1000 + Math.random() * 9000)}`;
       await updateProfile(res.user, { displayName: guestCallsign });
       setCallsign(guestCallsign);
     } catch (err: any) {
-      console.warn('Firebase anonymous auth not yet enabled in console, deploying resilient local guest agent:', err);
+      console.warn('Firebase anonymous auth fallback notice:', err);
       const fallbackUid = `guest_${Date.now()}`;
-      const guestCallsign = `Agent-${Math.floor(1000 + Math.random() * 9000)}`;
-      setCallsign(guestCallsign);
-      setUser({
+      const guestUser = {
         uid: fallbackUid,
         displayName: guestCallsign,
         isAnonymous: true,
         email: null,
         emailVerified: false
-      } as any);
+      } as any;
+      setUser(guestUser);
+      setCallsign(guestCallsign);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('life_os_active_uid', fallbackUid);
+        sessionStorage.setItem('life_os_active_callsign', guestCallsign);
+      }
+      setAuthState('AUTHENTICATED');
       await gameService.bindUser(fallbackUid, guestCallsign);
     }
   };
 
   const signOut = async () => {
     setError(null);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('life_os_active_uid');
+      sessionStorage.removeItem('life_os_active_callsign');
+    }
     try {
       await fbSignOut(auth);
     } catch (err: any) {
@@ -131,7 +194,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     setUser(null);
     setCallsign('Operator-01');
-    gameService.bindUser(null, 'Operator-01');
+    await gameService.bindUser(null, 'Operator-01');
+    setAuthState('UNAUTHENTICATED');
   };
 
   return (
@@ -139,7 +203,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       value={{
         user,
         callsign,
-        loading,
+        authState,
+        loading: authState === 'AUTH_LOADING',
         error,
         clearError,
         signInWithGoogle,
