@@ -43,12 +43,6 @@ Every goal you complete earns XP, attributes, gold, and expands a living world m
 | **Live Demo** | *https://life-os-chi-jade.vercel.app/* |
 | **Demo Video** | *https://drive.google.com/file/d/1nGegUe3Bqsw-lEzK1x1DNCtGDwHFwb6m/view?usp=sharing* |
 
-**Suggested screenshots:**
-1. Command Center dashboard
-2. Quest Matrix
-3. World Biosystem Map
-4. Oracle Game Master
-5. Character & Armory
 
 ---
 
