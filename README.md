@@ -1,72 +1,69 @@
-# LIFE//OS — The AI-Powered Life RPG
+<div align="center">
 
-> Turn real-world goals into quests, progression, rewards, and a living RPG system.
+# ⚡ LIFE//OS — The AI-Powered Life RPG
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+> **Turn real-life progress into a world worth returning to.**  
+> *A tactile futuristic Life RPG built with React 19, TypeScript, Firebase, & Web Audio.*
+
+[![React 19](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Firebase](https://img.shields.io/badge/Firebase-Auth+Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Vite](https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](./LICENSE)
+[![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%2B%20Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=flat-square)](./LICENSE)
+
+[**🌐 Live Application**](https://life-os-chi-jade.vercel.app/) &bull; [**📹 Product Video**](https://drive.google.com/file/d/1nGegUe3Bqsw-lEzK1x1DNCtGDwHFwb6m/view?usp=sharing)
+
+</div>
 
 ---
 
-## 🏆 Tech Zephyr 4.0 — Problem Statement: Life RPG
+## 🏆 Tech Zephyr 4.0 — Team IQ100
 
-**Team:** IQ100
-
-| Name | Role |
-|---|---|
-| **Tribhuwan Singh** *(Lead)* | Architecture, Firebase integration, state engine |
-| **Paresh Sahoo** | RPG progression engine, quest logic |
-| **Rishika Priyanka Mohanty** | Research And Presentation |
-| **Md Waiz Alam** | Audio synthesis, world topology, frontend |
+| Contributor | Focus Area |
+| :--- | :--- |
+| **Tribhuwan Singh** *(Lead)* | System Architecture, Cloud Firestore Engine, Firebase Integration |
+| **Paresh Sahoo** | RPG Game Engine, Quest Lifecycle & Level Math |
+| **Rishika Priyanka Mohanty** | System Research, User Experience & Presentation |
+| **Md Waiz Alam** | Procedural Web Audio API, World Biome Topology, Interface UI |
 
 ---
 
-## What is LIFE//OS?
+## 💡 Overview & Problem Statement
 
-Traditional productivity apps feel like chores — real-world benefits of habits and learning take months to show. Video games work because they provide immediate feedback: XP bars, rewards, and clear progression. **LIFE//OS** brings those mechanics to real life.
+Traditional habit trackers fail because real-world benefits take months to materialize. Games capture attention because they offer **immediate feedback**: XP gain, leveling up, and visual progress.
 
-Every goal you complete earns XP, attributes, gold, and expands a living world map shaped by your consistency across six real-life dimensions.
+**LIFE//OS** bridges real-world productivity with RPG mechanics. Every goal you complete converts into character experience, attribute growth, treasury gold, and dynamic territory influence across a living world map.
 
-**Problem → Solution → Difference**
-- **Problem:** Delayed gratification in productivity tools kills long-term motivation.
-- **Solution:** Real-world actions map to quests that reward XP, attributes, and territory influence.
-- **Difference:** Six attribute pillars, a dynamic world biosystem, procedural audio, and persistent cloud state.
+```
+Real-World Action ──► Quest Resolution ──► XP + Gold + Stat Gain ──► World Map Evolution
+```
 
----
+### Key Pillars
 
-## 🎮 Demo
-
-| | |
-|---|---|
-| **Live Demo** | *https://life-os-chi-jade.vercel.app/* |
-| **Demo Video** | *https://drive.google.com/file/d/1nGegUe3Bqsw-lEzK1x1DNCtGDwHFwb6m/view?usp=sharing* |
-
+1. **Non-Punitive Progression**: Zero destructive streak resets; consistency unlocks compounding momentum multipliers.
+2. **6 Core Attributes**: `Strength`, `Intellect`, `Discipline`, `Creativity`, `Wellness`, and `Social`.
+3. **Oracle Diagnostic Master**: Algorithmic state analysis that detects attribute imbalances and recommends high-leverage next moves.
+4. **Zero-Latency Audio**: Synthesized tactile audio feedback powered by the browser's native Web Audio API.
 
 ---
 
 ## ✨ Features
 
-| Feature | Description |
-|---|---|
-| **Quest Matrix** | Create, view, edit, and complete real-world quests with tiers, tags, and categories |
-| **RPG Progression** | Non-linear XP curve (`⌊1250 × level^1.32⌋`), streaks, momentum, and gold economy |
-| **6 Attribute Pillars** | Strength, Intellect, Discipline, Creativity, Wellness, Social |
-| **World Biosystem Map** | 6 territories that evolve as you complete quests |
-| **Oracle Game Master** | Algorithmic diagnostic engine analyzing attribute balance and recommending next actions |
-| **Armory & Rewards** | Spend earned gold on relics and equipment with passive stat bonuses |
-| **Cloud Persistence** | Firebase Auth + Firestore — state survives page refresh and works across devices |
-| **Procedural Audio** | Web Audio API synthesizes tactile feedback — no audio file downloads |
-| **Multi-Profile** | Multiple named character profiles under one account |
-| **Weekly Replay** | 7-day progress debrief with attribute telemetry |
+- 🗡️ **Quest Matrix**: Full CRUD quest workflow with difficulty tiers (`E` to `S`), time estimates, tags, and attribute gains.
+- ⚡ **RPG Progression Engine**: Non-linear level curve (`⌊1250 × level^1.32⌋`), XP bar, momentum percentage, and gold economy.
+- 🗺️ **World Biosystem**: 6 reactive territories that evolve from *Locked* to *Mastered* based on real activity.
+- 🔮 **Oracle Game Master**: Live diagnostic engine analyzing attribute balance, streak health, and optimal next actions.
+- 🛡️ **Armory & Relics**: In-game shop to unlock artifacts and equipment offering passive stat modifiers.
+- ☁️ **Cloud Synchronization**: Real-time multi-device sync backed by Firebase Auth and Cloud Firestore.
+- 👤 **Multi-Profile System**: Manage multiple named operator character builds under one account.
+- 📊 **Weekly Replay**: 7-day telemetry debrief with visual attribute gains and completion analytics.
 
-### 🗺️ World Territories
+---
 
-Six regions evolve from Locked → Discovered → Active → Mastered based on quest activity:
+## 🗺️ World Territories
 
-| Region | Attribute | Landmark |
-|---|---|---|
+| Region | Attribute Pillar | Landmark |
+| :--- | :--- | :--- |
 | **The Citadel** | Strength | The Basalt Bastion |
 | **The Archive** | Intellect | The Great Crystal Library |
 | **The Foundry** | Creativity | The Prismatic Plasma Spire |
@@ -74,175 +71,101 @@ Six regions evolve from Locked → Discovered → Active → Mastered based on q
 | **The Agora** | Social | The Sunken Colosseum Forum |
 | **The Nexus** | Discipline | The Chrono Meridian Spire |
 
-### 🔮 Oracle Game Master
-
-The Oracle analyzes your live game state — attribute values, active quests, streak momentum, and completions — to produce:
-- A recommended quest targeting your weakest attribute
-- Imbalance diagnostics (e.g. high Intellect but neglected Wellness)
-- Alternative strategic moves with explanations
-
-> **Note:** The Oracle uses deterministic algorithmic analysis of your game state. The `@google/genai` package is included as a dependency for planned Gemini integration.
-
 ---
 
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React 19 + TypeScript |
-| Build | Vite 6 |
-| Styling | Tailwind CSS v4 |
-| Routing | TanStack React Router |
-| Auth | Firebase Authentication |
-| Database | Cloud Firestore |
-| Animation | Framer Motion + Canvas Confetti |
-| Audio | Web Audio API |
-| Charts | Recharts |
-| Icons | Lucide React |
-
----
-
-## 🏗️ Architecture
+## 🛠️ Tech Stack & Architecture
 
 ```
-User
-  ↓
-React + TypeScript (Vite)
-  ↓
-Application State  ←→  Services (gameService, oracleService, audioService)
-  ↓
-Firebase Authentication + Cloud Firestore
-  ↓
-/users/{uid}/  ←  player profile, quests, inventory, replay subcollections
+                 ┌──────────────────────────────────────┐
+                 │       React 19 + TypeScript          │
+                 │      (TanStack Router + Vite)        │
+                 └──────────────────┬───────────────────┘
+                                    │
+               ┌────────────────────┴────────────────────┐
+               │         Application State Layer         │
+               │   (GameStateContext, AuthContext, etc.) │
+               └──────────┬───────────────────┬──────────┘
+                          │                   │
+   ┌──────────────────────▼──┐             ┌──▼──────────────────────┐
+   │ Firebase Auth & Firestore │             │ Web Audio API Synthesizer│
+   │ (/users/{uid} documents)│             │  (Tactile sound engine) │
+   └─────────────────────────┘             └─────────────────────────┘
 ```
+
+| Domain | Technology |
+| :--- | :--- |
+| **Core Framework** | React 19, TypeScript 5.8 |
+| **Build & Bundler** | Vite 6.2 |
+| **Styling & Layout** | Tailwind CSS v4, Lucide React Icons |
+| **Routing** | TanStack React Router |
+| **Authentication** | Firebase Auth (Google OAuth, Email/Password, Guest Mode) |
+| **Database** | Cloud Firestore |
+| **Animations** | Framer Motion, Canvas Confetti |
+| **Audio** | Custom Web Audio API Synthesizer |
+| **Charts & Data** | Recharts |
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) ≥ 18
-- npm
+- **Node.js** ≥ 18.0.0
+- **npm** ≥ 9.0.0
 
-### Install
+### 1. Clone & Install
 ```bash
 git clone https://github.com/Tribhuwansingh2023/life-os.git
 cd life-os
 npm install
 ```
 
-### Environment Variables
+### 2. Configure Environment
+Create a `.env` file based on `.env.example`:
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your credentials:
+Add your Firebase configuration keys:
 ```env
-# Firebase (required for auth + persistence)
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-VITE_FIREBASE_DATABASE_ID=(default)
-
-# Gemini (for planned AI Oracle features)
-GEMINI_API_KEY=
+VITE_FIREBASE_API_KEY=your_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
 ```
 
-### Run
+### 3. Launch Development Server
 ```bash
 npm run dev
-# → http://localhost:3000
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 🔐 Firebase Setup
-
-1. Create a project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable **Authentication** — Google Sign-In and Email/Password
-3. Create a **Firestore** database
-4. Copy your config values into `.env`
-5. The `firestore.rules` file enforces user-level data isolation
-
----
-
-## 🛡️ Security
-
-- Authentication required to read or write user data
-- Firestore rules isolate each user's documents under `/users/{uid}`
-- `.env` is gitignored — credentials are never committed
-- Guest access is session-scoped only
-
----
-
-## ⌨️ Keyboard Shortcuts
+## ⌨️ Hotkeys & Navigation
 
 | Key | Action |
-|:---:|---|
+| :---: | :--- |
 | `1` | Command Center |
 | `2` | Quest Matrix |
 | `3` | Character & Build |
-| `4` | World Map |
+| `4` | World Biosystem Map |
 | `5` | Oracle Game Master |
 | `6` | Weekly Replay |
 | `7` | Armory & Inventory |
 | `8` | System Settings |
-| `Q` | Open Create Quest modal |
-| `M` | Toggle audio |
-| `?` | Show shortcuts |
-| `Esc` | Close modal |
-
----
-
-## 📂 Project Structure
-
-```
-life-os/
-├── src/
-│   ├── components/         # auth, layout, quest, rpg, ui, world
-│   ├── context/            # AuthContext, GameStateContext, SoundContext
-│   ├── data/               # Seed data, world region configs
-│   ├── hooks/              # useGameState
-│   ├── lib/                # Firebase initialization
-│   ├── pages/              # Route-level page components
-│   ├── services/           # gameService, oracleService, audioService, firestoreService
-│   ├── types/              # TypeScript interfaces
-│   ├── App.tsx
-│   ├── router.tsx
-│   └── index.css
-├── firestore.rules
-├── .env.example
-└── package.json
-```
-
----
-
-## 🏆 Hackathon Alignment
-
-**Tech Zephyr 4.0 — Problem Statement: Life RPG**
-
-| Requirement | Implementation |
-|---|---|
-| User Authentication | Firebase Auth — Google, Email/Password, Guest |
-| Cloud Persistence | Firestore per-user document store (`/users/{uid}`) |
-| Full CRUD | Quest create, read, update, delete |
-| RPG Progression | XP curve, levels, attributes, streaks, gold |
-| Gamification | World map, boss raids, armory, momentum, streaks |
-| Responsive UI | Mobile nav + desktop sidebar, all breakpoints |
-| Accessibility | Full keyboard navigation (1–8, Q, M, ?, Esc), ARIA roles |
+| `Q` | Open Create Quest Modal |
+| `M` | Toggle Audio Engine |
+| `?` | Keyboard Shortcuts Reference |
+| `Esc` | Close Active Modal |
 
 ---
 
 ## 📄 License
 
-[MIT](./LICENSE) © 2026 Tribhuwan Singh
-
----
+Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
 
 <div align="center">
-  <sub>Built with ⚡ for Tech Zephyr 4.0 by <b>Team IQ100</b></sub>
+  <sub>Built for <b>Tech Zephyr 4.0</b> by <b>Team IQ100</b></sub>
 </div>
