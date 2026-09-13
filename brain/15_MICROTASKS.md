@@ -26,7 +26,7 @@
 - [x] Task 3.8: System Config (`SettingsPage.tsx`) with audio synthesizer controls and keyboard cheatsheet.
 
 ## PHASE 4: BACKEND & CLOUD DEPLOYMENT (DEFERRED TO NEXT PHASE)
-- [ ] Task 4.1: Express REST API scaffold (`/api/v1/quests`, `/api/v1/player`).
-- [ ] Task 4.2: PostgreSQL schema migration with Drizzle ORM.
-- [ ] Task 4.3: Google Gemini API integration for continuous Oracle generation.
-- [ ] Task 4.4: Cloud Run container deployment.
+- [x] Task 4.1: Express REST API scaffold (`/api/v1/quests`, `/api/v1/player`).
+- [x] Task 4.2: PostgreSQL schema migration with Drizzle ORM.
+- [x] Task 4.3: Google Gemini API integration for continuous Oracle generation.
+- [x] Task 4.4: Cloud Run container deployment.
