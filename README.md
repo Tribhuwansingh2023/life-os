@@ -116,8 +116,6 @@ Firebase Authentication + Cloud Firestore
 /users/{uid}/  ←  player profile, quests, inventory, replay subcollections
 ```
 
-Detailed architecture documentation is in [`/brain`](./brain/).
-
 ---
 
 ## 🚀 Quick Start
