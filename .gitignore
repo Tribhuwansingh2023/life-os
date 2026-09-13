@@ -34,3 +34,9 @@ pnpm-debug.log*
 *.sln
 *.sw?
 Thumbs.db
+
+# AI Assistant & IDE artifacts
+brain/
+.brain/
+.gemini/
+
