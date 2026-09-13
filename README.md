@@ -18,7 +18,7 @@
 |---|---|
 | **Tribhuwan Singh** *(Lead)* | Architecture, Firebase integration, state engine |
 | **Paresh Sahoo** | RPG progression engine, quest logic |
-| **Rishika Priyanka Mohanty** | UI/UX design, design system, accessibility |
+| **Rishika Priyanka Mohanty** | Research And Presentation |
 | **Md Waiz Alam** | Audio synthesis, world topology, frontend |
 
 ---
@@ -40,8 +40,8 @@ Every goal you complete earns XP, attributes, gold, and expands a living world m
 
 | | |
 |---|---|
-| **Live Demo** | *(deploy URL)* |
-| **Demo Video** | *(video URL)* |
+| **Live Demo** | *https://life-os-chi-jade.vercel.app/* |
+| **Demo Video** | *https://drive.google.com/file/d/1nGegUe3Bqsw-lEzK1x1DNCtGDwHFwb6m/view?usp=sharing* |
 
 **Suggested screenshots:**
 1. Command Center dashboard
@@ -210,13 +210,6 @@ npm run dev
 
 ```
 life-os/
-├── brain/                  # Architecture & design documentation
-│   ├── 00_MASTER_RULES.md
-│   ├── 01_PRD.md
-│   ├── 02_TRD.md
-│   ├── 03_ARCHITECTURE.md
-│   ├── 04_DATA_MODEL.md
-│   └── 10_SECURITY.md
 ├── src/
 │   ├── components/         # auth, layout, quest, rpg, ui, world
 │   ├── context/            # AuthContext, GameStateContext, SoundContext
@@ -249,16 +242,6 @@ life-os/
 | Gamification | World map, boss raids, armory, momentum, streaks |
 | Responsive UI | Mobile nav + desktop sidebar, all breakpoints |
 | Accessibility | Full keyboard navigation (1–8, Q, M, ?, Esc), ARIA roles |
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Live Gemini AI recommendations in the Oracle
-- [ ] World events and boss raid seasons
-- [ ] Social / guild features
-- [ ] PWA / mobile app
-- [ ] Advanced analytics and replay export
 
 ---
 
